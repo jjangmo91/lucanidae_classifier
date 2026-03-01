@@ -1,0 +1,24 @@
+# configs/taxonomy.yaml
+taxonomy_mapping:
+  # 아종 -> 종 통합
+  "Serrognathus titanus castanicolor": "Serrognathus_titanus"
+  "Serrognathus titanus": "Serrognathus_titanus"
+  "Prosopocoilus inclinatus inclinatus": "Prosopocoilus_inclinatus"
+  "Prosopocoilus inclinatus": "Prosopocoilus_inclinatus"
+  "Dorcus rectus rectus": "Dorcus_rectus"
+  "Dorcus rectus": "Dorcus_rectus"
+  "Dorcus hopei binodulosus": "Dorcus_hopei"
+  "Dorcus hopei": "Dorcus_hopei"
+  "Dorcus rubrofemoratus chenpengi": "Dorcus_rubrofemoratus"
+  "Dorcus rubrofemoratus": "Dorcus_rubrofemoratus"
+  
+  # 속(Genus) 단위 통합
+  "Lucanus": "Lucanus_dybowski"
+  "Serrognathus": "Serrognathus_titanus"
+  "Prosopocoilus": "Prosopocoilus_inclinatus"
+  "Dorcus": "Dorcus_rectus"
+
+unidentified_groups:
+  - "Lucanidae"
+  - "Lucanini"
+  - "Stag Beetles"

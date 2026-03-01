@@ -1,0 +1,16 @@
+# .gitignore
+
+# Environments
+lucanidae_classifier_venv/
+.env
+
+# Data and Weights
+data/
+models/weights/
+experiments/
+
+# Log and Cache
+wandb/
+__pycahe__/
+*.pyc
+.ipynb_checkpoints/

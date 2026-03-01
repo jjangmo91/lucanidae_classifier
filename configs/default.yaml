@@ -1,0 +1,6 @@
+# configs/default.yaml
+data_collection:
+  taxon_id: 49083           # 사슴벌레과 고유 ID
+  place_id: 6891            # 대한민국 고유 ID
+  max_pages: 10             # 최대 수집 페이지 수 (페이지당 200건)
+  output_dir: "./data/raw/inaturalist"
