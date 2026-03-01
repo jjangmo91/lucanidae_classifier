@@ -33,6 +33,7 @@ lucanidae_classifier/
 ├── main.py             # Entry point: Smart Data Pipeline
 ├── train.py            # Entry point: Model Training & WandB Logging
 └── predict.py          # Entry point: Top-K Inference Pipeline
+```
 
 ## 3. Quick Start (Inference)
 
