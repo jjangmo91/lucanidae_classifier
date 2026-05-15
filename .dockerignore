@@ -1,0 +1,42 @@
+# 가상환경
+lucanidae_classifier_venv/
+
+# 비밀키
+.env
+
+# 학습 데이터 / 업로드 이미지 (volume mount로 처리)
+data/
+
+# 모델 웨이트 (volume mount로 처리)
+models/weights/
+
+# 실험 추적
+mlartifacts/
+mlruns/
+mlflow.db
+experiments/
+runs/
+lucanidae-detector/
+wandb/
+
+# 학습 아티팩트
+*.pt
+*.pth
+
+# Python 캐시
+__pycache__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+# 프론트엔드 (API 서버와 분리 배포)
+frontend/
+
+# Git / IDE
+.git/
+.claude/
+.vscode/
+*.md
+
+# OS
+.DS_Store

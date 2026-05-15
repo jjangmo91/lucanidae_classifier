@@ -15,6 +15,18 @@ services:
       - ./models:/app/models:ro    # 모델 웨이트 마운트 (읽기전용)
       - ./data/uploads:/app/data/uploads  # 업로드 이미지 영속 저장
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    env_file: ./frontend/.env.local
+    environment:
+      - BACKEND_URL=http://api:8000   # docker 내부 서비스명으로 통신
+    depends_on:
+      - api
+
   db:
     image: postgres:16-alpine
     ports:

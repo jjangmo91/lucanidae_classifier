@@ -4,14 +4,16 @@ import json
 from datetime import datetime, timezone
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from typing import Optional
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
 from PIL import Image
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.deps import get_prediction_service, get_session
+from src.api.routes.auth import get_current_user_id
 from src.db.models import Specimen
-from src.db.repository import SpecimenRepository
+from src.db.repository import SpecimenRepository, UserRepository
 from src.services.prediction import PredictionResult, PredictionService
 
 router = APIRouter(prefix="/api/v1", tags=["predict"])
@@ -23,9 +25,17 @@ ALLOWED_TYPES = {"image/jpeg", "image/png", "image/webp", "image/heic", "image/h
 MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB
 
 
+def _to_gps_grid(lat: float, lng: float) -> str:
+    """좌표를 약 1km 격자로 양자화해 저장 (raw GPS 미보관)."""
+    return f"lat:{round(lat, 2)},lng:{round(lng, 2)}"
+
+
 @router.post("/predict", response_model=list[dict])
 async def predict(
+    request: Request,
     file: UploadFile = File(...),
+    lat: Optional[float] = Form(None),
+    lng: Optional[float] = Form(None),
     service: PredictionService = Depends(get_prediction_service),
     session: AsyncSession = Depends(get_session),
 ):
@@ -43,6 +53,11 @@ async def predict(
         raise HTTPException(status_code=422, detail="이미지를 열 수 없습니다")
     results = await service.predict_image(image)
 
+    user_id_str = get_current_user_id(request)
+    import uuid as _uuid
+    user_uuid   = _uuid.UUID(user_id_str) if user_id_str else None
+    gps_grid    = _to_gps_grid(lat, lng) if lat is not None and lng is not None else None
+
     repo     = SpecimenRepository(session)
     response = []
     for r in results:
@@ -54,14 +69,22 @@ async def predict(
             "ood_score":            r.ood_score,
             "top3_json":            json.dumps([{"species": p.species, "confidence": round(p.confidence, 4)} for p in r.top3]),
             "preprocessing_mode":   r.preprocessing_mode,
+            "user_id":              user_uuid,
+            "gps_grid":             gps_grid,
         })
 
-        # 이미지 저장
         img_path = UPLOAD_DIR / f"{specimen.id}.jpg"
         image.save(img_path, format="JPEG", quality=85)
         await repo.update(specimen.id, {"image_url": f"/uploads/{specimen.id}.jpg"})
 
         await session.commit()
+
+        # 등급 재계산
+        if user_uuid:
+            user_repo = UserRepository(session)
+            await user_repo.recalculate_grade(user_uuid)
+            await session.commit()
+
         response.append(_to_response(r, str(specimen.id)))
     return response
 

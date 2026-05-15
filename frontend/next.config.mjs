@@ -1,19 +1,23 @@
 /** @type {import('next').NextConfig} */
+
+// 개발: http://localhost:8000 / 프로덕션: docker 서비스명 또는 외부 URL
+const BACKEND = process.env.BACKEND_URL ?? "http://localhost:8000";
+
 const nextConfig = {
+  output: "standalone",
   async rewrites() {
     return [
       {
-        // 프론트에서 /api/v1/* 요청 → FastAPI localhost:8000 으로 전달
         source: "/api/:path*",
-        destination: "http://localhost:8000/api/:path*",
+        destination: `${BACKEND}/api/:path*`,
       },
       {
         source: "/admin/:path*",
-        destination: "http://localhost:8000/admin/:path*",
+        destination: `${BACKEND}/admin/:path*`,
       },
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:8000/uploads/:path*",
+        destination: `${BACKEND}/uploads/:path*`,
       },
     ];
   },

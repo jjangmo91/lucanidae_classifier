@@ -25,8 +25,23 @@ export function UploadSection() {
     setState("scanning");
     setErrMsg(null);
 
+    let lat: number | null = null, lng: number | null = null;
+    if (typeof navigator !== "undefined" && navigator.geolocation) {
+      try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+          navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 4000 })
+        );
+        lat = pos.coords.latitude;
+        lng = pos.coords.longitude;
+      } catch { /* GPS 거부/실패 시 조용히 무시 */ }
+    }
+
     const form = new FormData();
     form.append("file", file);
+    if (lat !== null && lng !== null) {
+      form.append("lat", String(lat));
+      form.append("lng", String(lng));
+    }
 
     try {
       const res = await fetch("/api/v1/predict", { method: "POST", body: form });
@@ -130,10 +145,10 @@ export function UploadSection() {
         {state === "idle" && (
           <>
             <h1 className="text-4xl font-black tracking-tight leading-none">
-              <span className="text-amber-400 text-glow">사슴벌레</span> 동정기
+              <span className="text-amber-400 text-glow">루카</span>덱스
             </h1>
             <p className="text-sm text-muted-foreground">
-              사진 한 장으로 한국 사슴벌레 16종을 즉시 분류
+              사진 한 장으로 한국 사슴벌레 16종을 즉시 동정
             </p>
           </>
         )}

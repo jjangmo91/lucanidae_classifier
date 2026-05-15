@@ -34,7 +34,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "왕사슴벌레",
     en: "Korean stag beetle",
     scientific: "Dorcus hopei binodulosus",
-    rarity: 2,
+    rarity: 4,
     sizeM: "40–80 mm",
     sizeF: "35–50 mm",
     habitat: "전국 산림 (주로 중부 이남 참나무림)",
@@ -49,7 +49,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "넓적사슴벌레",
     en: "Giant stag beetle",
     scientific: "Dorcus titanus castanicolor",
-    rarity: 2,
+    rarity: 1,
     sizeM: "35–75 mm",
     sizeF: "35–50 mm",
     habitat: "전국 산림",
@@ -64,7 +64,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "사슴벌레",
     en: "Japanese stag beetle",
     scientific: "Lucanus maculifemoratus dybowskyi",
-    rarity: 2,
+    rarity: 2,  // B
     sizeM: "40–80 mm",
     sizeF: "35–50 mm",
     habitat: "전국 산림 (참나무류 우점 지역)",
@@ -94,7 +94,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "두점박이사슴벌레",
     en: "Two-spotted stag beetle",
     scientific: "Prosopocoilus astacoides blanchardi",
-    rarity: 2,
+    rarity: 3,  // A
     sizeM: "25–52 mm",
     sizeF: "25–35 mm",
     habitat: "남부 지방 산림 (제주도 포함)",
@@ -109,7 +109,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "애사슴벌레",
     en: "Small stag beetle",
     scientific: "Dorcus rectus rectus",
-    rarity: 1,
+    rarity: 1,  // C
     sizeM: "18–38 mm",
     sizeF: "18–28 mm",
     habitat: "전국 (평지~저산지)",
@@ -154,7 +154,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "털보왕사슴벌레",
     en: "Korean hairy stag beetle",
     scientific: "Dorcus carinulatus koreanus",
-    rarity: 3,
+    rarity: 4,  // S
     sizeM: "35–65 mm",
     sizeF: "30–45 mm",
     habitat: "중부 이북 산림",
@@ -199,7 +199,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "꼬마넓적사슴벌레",
     en: "Small flat stag beetle",
     scientific: "Aegus laevicollis subnitidus",
-    rarity: 3,
+    rarity: 4,  // S
     sizeM: "15–28 mm",
     sizeF: "13–22 mm",
     habitat: "남부 지방 (제주도 포함)",
@@ -229,7 +229,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "엷은털왕사슴벌레",
     en: "Thin-haired stag beetle",
     scientific: "Dorcus tenuihirsutus",
-    rarity: 3,
+    rarity: 4,  // S
     sizeM: "35–60 mm",
     sizeF: "28–42 mm",
     habitat: "중부 이북 산림",
@@ -244,7 +244,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "길쭉꼬마사슴벌레",
     en: "Elongated pygmy stag beetle",
     scientific: "Figulus punctatus",
-    rarity: 3,
+    rarity: 1,  // C
     sizeM: "12–22 mm",
     sizeF: "11–18 mm",
     habitat: "남부 해안, 제주도",
@@ -259,7 +259,7 @@ export const ALL_SPECIES: SpeciesInfo[] = [
     ko: "큰꼬마사슴벌레",
     en: "Large pygmy stag beetle",
     scientific: "Figulus binodulus",
-    rarity: 4,
+    rarity: 4,  // S
     sizeM: "10–20 mm",
     sizeF: "9–17 mm",
     habitat: "제주도",

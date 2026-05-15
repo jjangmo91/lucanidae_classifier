@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { SPECIES_BY_MODEL_KEY } from "@/lib/species-data";
+import { SPECIES_BY_MODEL_KEY, ALL_SPECIES } from "@/lib/species-data";
+import { useAuth } from "@/lib/auth";
 
 interface Prediction {
   prediction_id: string;
@@ -18,24 +19,18 @@ interface Prediction {
 
 type FeedbackState = "idle" | "correct_sent" | "correcting" | "corrected" | "error";
 
-const SPECIES_OPTIONS = [
-  { value: "Prosopocoilus_astacoides_blanchardi",  label: "두점박이사슴벌레" },
-  { value: "Dorcus_titanus_castanicolor",           label: "넓적사슴벌레" },
-  { value: "Lucanus_maculifemoratus_dybowskyi",     label: "사슴벌레" },
-  { value: "Dorcus_hopei_binodulosus",              label: "왕사슴벌레" },
-  { value: "Prosopocoilus_inclinatus_inclinatus",   label: "톱사슴벌레" },
-  { value: "Dorcus_rectus_rectus",                  label: "애사슴벌레" },
-  { value: "Dorcus_rubrofemoratus_rubrofemoratus",  label: "홍다리사슴벌레" },
-  { value: "Prismognathus_dauricus",                label: "다우리아사슴벌레" },
-  { value: "Dorcus_carinulatus_koreanus",           label: "털보왕사슴벌레" },
-  { value: "Platycerus_hongwonpyoi_hongwonpyoi",    label: "원표애보라사슴벌레" },
-  { value: "Dorcus_consentaneus_consentaneus",      label: "참넓적사슴벌레" },
-  { value: "Aegus_laevicollis_subnitidus",          label: "꼬마넓적사슴벌레" },
-  { value: "Nigidius_miwai",                        label: "뿔꼬마사슴벌레" },
-  { value: "Dorcus_tenuihirsutus",                  label: "엷은털왕사슴벌레" },
-  { value: "Figulus_punctatus",                     label: "길쭉꼬마사슴벌레" },
-  { value: "Figulus_binodulus",                     label: "큰꼬마사슴벌레" },
-];
+const KAKAO_KEY = process.env.NEXT_PUBLIC_KAKAO_APP_KEY ?? "";
+
+const TIER_LABEL: Record<number, string> = { 4: "S", 3: "A", 2: "B", 1: "C" };
+
+// 희귀도 내림차순(S→A→B→C)으로 정렬된 종 목록
+const SPECIES_OPTIONS = [...ALL_SPECIES]
+  .sort((a, b) => b.rarity - a.rarity)
+  .map(sp => ({
+    value: sp.modelKey,
+    label: `[${TIER_LABEL[sp.rarity]}] ${sp.ko}`,
+    rarity: sp.rarity,
+  }));
 
 const NON_RESULT_MESSAGE: Record<string, { icon: string; title: string; text: string }> = {
   no_beetle:      { icon: "🔍", title: "감지 실패",     text: "사진에서 사슴벌레를 찾을 수 없어요" },
@@ -45,16 +40,58 @@ const NON_RESULT_MESSAGE: Record<string, { icon: string; title: string; text: st
 };
 
 export function ResultCard({ predictionId }: { predictionId: string }) {
+  const { isLoggedIn } = useAuth();
   const [data, setData]             = useState<Prediction | null>(null);
   const [feedback, setFeedback]     = useState<FeedbackState>("idle");
   const [correction, setCorrection] = useState("");
   const [sex, setSex]               = useState("");
   const [maleForm, setMaleForm]     = useState("");
+  const [copied, setCopied]         = useState(false);
 
   useEffect(() => {
     const raw = sessionStorage.getItem(predictionId) ?? localStorage.getItem(predictionId);
     if (raw) setData(JSON.parse(raw));
   }, [predictionId]);
+
+  useEffect(() => {
+    if (!KAKAO_KEY) return;
+    const script = document.createElement("script");
+    script.src = "https://developers.kakao.com/sdk/js/kakao.min.js";
+    script.onload = () => {
+      const K = (window as any).Kakao;
+      if (K && !K.isInitialized()) K.init(KAKAO_KEY);
+    };
+    document.head.appendChild(script);
+  }, []);
+
+  async function handleShare() {
+    if (!data) return;
+    const url  = `${window.location.origin}/result/${predictionId}`;
+    const text = `AI가 ${data.species_ko ?? data.species.replace(/_/g, " ")}로 동정했어요! 신뢰도 ${(data.confidence * 100).toFixed(1)}%`;
+    if (navigator.share) {
+      try { await navigator.share({ title: "루카덱스 동정 결과", text, url }); } catch { /* 취소 */ }
+    } else {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  function handleKakaoShare() {
+    if (!data) return;
+    const K = (window as any).Kakao;
+    if (!K?.isInitialized()) return;
+    const url = `${window.location.origin}/result/${predictionId}`;
+    K.Share.sendDefault({
+      objectType: "feed",
+      content: {
+        title:       `${data.species_ko ?? data.species.replace(/_/g, " ")} 동정 완료`,
+        description: `AI 신뢰도 ${(data.confidence * 100).toFixed(1)}% · 루카덱스 LucaDex`,
+        imageUrl:    `${window.location.origin}/lucanus.png`,
+        link:        { mobileWebUrl: url, webUrl: url },
+      },
+    });
+  }
 
   async function sendFeedback(isCorrect: boolean, correctSpecies?: string) {
     try {
@@ -106,6 +143,7 @@ export function ResultCard({ predictionId }: { predictionId: string }) {
   }
 
   const spInfo       = SPECIES_BY_MODEL_KEY[data.species];
+  const rarityPts    = spInfo?.rarity ?? 0;
   const confidencePct = (data.confidence * 100).toFixed(1);
   const isLow        = data.result_type === "low_confidence";
 
@@ -192,90 +230,150 @@ export function ResultCard({ predictionId }: { predictionId: string }) {
         </div>
 
         {/* Feedback */}
-        {feedback === "idle" && (
-          <div className="flex gap-2 border-t border-border/50 pt-4">
-            <Button
-              variant="outline"
-              className="flex-1 text-sm border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/20 hover:border-emerald-600/50"
-              onClick={() => sendFeedback(true)}
-            >
-              맞아요
-            </Button>
-            <Button
-              variant="outline"
-              className="flex-1 text-sm border-border hover:border-amber-500/30 hover:bg-amber-500/5"
-              onClick={() => setFeedback("correcting")}
-            >
-              아니에요
-            </Button>
-          </div>
-        )}
+        <div className="border-t border-border/50 pt-4 space-y-3">
+          {feedback === "idle" && (
+            <>
+              <p className="text-[11px] text-muted-foreground font-mono uppercase tracking-widest">
+                AI 동정이 맞나요?
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  className="flex-1 text-sm border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/20 hover:border-emerald-600/50"
+                  onClick={() => sendFeedback(true)}
+                >
+                  ✓ 맞아요{isLoggedIn && rarityPts > 0 ? ` +${rarityPts}pts` : ""}
+                </Button>
+                <Button
+                  variant="outline"
+                  className="flex-1 text-sm border-border hover:border-red-500/30 hover:bg-red-500/5 hover:text-red-400"
+                  onClick={() => setFeedback("correcting")}
+                >
+                  ✗ 아니에요
+                </Button>
+              </div>
+              {!isLoggedIn && (
+                <p className="text-[10px] text-muted-foreground/60 text-center">
+                  로그인하면 피드백 포인트가 적립됩니다
+                </p>
+              )}
+            </>
+          )}
 
-        {feedback === "correcting" && (
-          <div className="space-y-2 border-t border-border/50 pt-4">
-            <select
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-amber-500/50"
-              value={correction}
-              onChange={(e) => setCorrection(e.target.value)}
-            >
-              <option value="">종을 선택하세요</option>
-              {SPECIES_OPTIONS.map((s) => (
-                <option key={s.value} value={s.value}>
-                  {s.label} — {s.value.replace(/_/g, " ")}
-                </option>
-              ))}
-            </select>
+          {feedback === "correcting" && (
+            <div className="space-y-2.5">
+              <p className="text-[11px] text-muted-foreground font-mono uppercase tracking-widest">
+                실제 종을 알려주세요
+              </p>
 
-            <select
-              className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-amber-500/50"
-              value={sex}
-              onChange={(e) => setSex(e.target.value)}
-            >
-              <option value="">성별 (선택)</option>
-              <option value="male">수컷</option>
-              <option value="female">암컷</option>
-              <option value="unknown">모름</option>
-            </select>
-
-            {sex === "male" && (
               <select
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-amber-500/50"
-                value={maleForm}
-                onChange={(e) => setMaleForm(e.target.value)}
+                value={correction}
+                onChange={(e) => setCorrection(e.target.value)}
               >
-                <option value="">수컷 형태 (선택)</option>
-                <option value="major">대형 (뿔 큰 수컷)</option>
-                <option value="minor">소형 (뿔 작은 수컷)</option>
-                <option value="intermediate">중간형</option>
+                <option value="">종 선택 (S→A→B→C 순)</option>
+                {SPECIES_OPTIONS.map((s) => (
+                  <option key={s.value} value={s.value}>{s.label}</option>
+                ))}
               </select>
-            )}
 
-            <div className="flex gap-2">
-              <Button
-                className="flex-1 bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold"
-                onClick={() => sendFeedback(false, correction)}
-                disabled={!correction.trim()}
-              >
-                제출
-              </Button>
-              <Button variant="outline" className="flex-1 border-border" onClick={() => setFeedback("idle")}>
-                취소
-              </Button>
+              <div className="flex gap-2">
+                <select
+                  className="flex-1 border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-amber-500/50"
+                  value={sex}
+                  onChange={(e) => setSex(e.target.value)}
+                >
+                  <option value="">성별 (선택)</option>
+                  <option value="male">수컷</option>
+                  <option value="female">암컷</option>
+                  <option value="unknown">모름</option>
+                </select>
+
+                {sex === "male" && (
+                  <select
+                    className="flex-1 border border-border rounded-lg px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:border-amber-500/50"
+                    value={maleForm}
+                    onChange={(e) => setMaleForm(e.target.value)}
+                  >
+                    <option value="">형태 (선택)</option>
+                    <option value="major">대형 (뿔 큼)</option>
+                    <option value="minor">소형 (뿔 작음)</option>
+                    <option value="intermediate">중간형</option>
+                  </select>
+                )}
+              </div>
+
+              <p className="text-[10px] text-muted-foreground/50">
+                교정 정보는 AI 학습 데이터로 활용됩니다
+              </p>
+
+              <div className="flex gap-2">
+                <Button
+                  className="flex-1 bg-amber-500 hover:bg-amber-400 text-amber-950 font-bold"
+                  onClick={() => sendFeedback(false, correction)}
+                  disabled={!correction.trim()}
+                >
+                  제출
+                </Button>
+                <Button variant="outline" className="flex-1 border-border" onClick={() => setFeedback("idle")}>
+                  취소
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {(feedback === "correct_sent" || feedback === "corrected") && (
-          <p className="text-center text-sm text-amber-400/80 border-t border-border/50 pt-4">
-            피드백이 저장됐어요. 감사합니다!
-          </p>
-        )}
+          {feedback === "correct_sent" && (
+            <div className="text-center space-y-1.5 py-1">
+              <p className="text-emerald-400 font-bold">✓ 피드백 감사합니다!</p>
+              {isLoggedIn && rarityPts > 0 ? (
+                <p className="text-sm text-amber-400 font-black">+{rarityPts} pts 적립</p>
+              ) : !isLoggedIn ? (
+                <p className="text-xs text-muted-foreground">
+                  <Link href="/my" className="text-amber-400 hover:underline">로그인</Link>하면 포인트가 쌓여요
+                </p>
+              ) : null}
+            </div>
+          )}
 
-        {feedback === "error" && (
-          <p className="text-center text-sm text-destructive border-t border-border/50 pt-4">
-            저장 실패 — 잠시 후 다시 시도해보세요
-          </p>
-        )}
+          {feedback === "corrected" && (
+            <div className="text-center space-y-1 py-1">
+              <p className="text-amber-400 font-bold">교정 정보가 저장됐어요</p>
+              <p className="text-xs text-muted-foreground">AI 학습에 반영됩니다. 감사합니다!</p>
+            </div>
+          )}
+
+          {feedback === "error" && (
+            <div className="text-center space-y-2 py-1">
+              <p className="text-sm text-destructive">저장에 실패했어요</p>
+              <button
+                className="text-xs text-amber-400 hover:underline"
+                onClick={() => setFeedback("idle")}
+              >
+                다시 시도하기
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Share */}
+        <div className="flex gap-2 border-t border-border/50 pt-4">
+          <Button
+            variant="outline"
+            className="flex-1 text-sm border-border hover:border-amber-500/30 hover:bg-amber-500/5"
+            onClick={handleShare}
+          >
+            {copied ? "✓ 복사됨" : "📤 공유하기"}
+          </Button>
+          {KAKAO_KEY && (
+            <Button
+              variant="outline"
+              className="flex-1 text-sm border-yellow-600/40 text-yellow-400 hover:bg-yellow-900/20 hover:border-yellow-500/50"
+              onClick={handleKakaoShare}
+            >
+              💬 카카오
+            </Button>
+          )}
+        </div>
       </div>
 
       <style>{`

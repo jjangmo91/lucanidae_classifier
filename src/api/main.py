@@ -19,13 +19,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from src.api.deps import init_db
-from src.api.routes import admin, feedback, predict
+from src.api.routes import admin, auth, community, feedback, predict
 from src.ml.manager import ModelManager
 
 _cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")]
 
 app = FastAPI(
-    title="Lucanidae Classifier API",
+    title="LucaDex API",
     version="1.0.0",
     docs_url="/docs" if os.getenv("ENV", "development") == "development" else None,
     redoc_url=None,
@@ -34,6 +34,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=_cors_origins,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -41,6 +42,8 @@ app.add_middleware(
 app.include_router(predict.router)
 app.include_router(feedback.router)
 app.include_router(admin.router)
+app.include_router(auth.router)
+app.include_router(community.router)
 
 upload_dir = Path("data/uploads")
 upload_dir.mkdir(parents=True, exist_ok=True)
