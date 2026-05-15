@@ -69,7 +69,7 @@ export function ResultCard({ predictionId }: { predictionId: string }) {
     const url  = `${window.location.origin}/result/${predictionId}`;
     const text = `AI가 ${data.species_ko ?? data.species.replace(/_/g, " ")}로 동정했어요! 신뢰도 ${(data.confidence * 100).toFixed(1)}%`;
     if (navigator.share) {
-      try { await navigator.share({ title: "루카덱스 동정 결과", text, url }); } catch { /* 취소 */ }
+      try { await navigator.share({ title: "비틀덱스 동정 결과", text, url }); } catch { /* 취소 */ }
     } else {
       await navigator.clipboard.writeText(url);
       setCopied(true);
@@ -86,7 +86,7 @@ export function ResultCard({ predictionId }: { predictionId: string }) {
       objectType: "feed",
       content: {
         title:       `${data.species_ko ?? data.species.replace(/_/g, " ")} 동정 완료`,
-        description: `AI 신뢰도 ${(data.confidence * 100).toFixed(1)}% · 루카덱스 LucaDex`,
+        description: `AI 신뢰도 ${(data.confidence * 100).toFixed(1)}% · 비틀덱스 BeetleDex`,
         imageUrl:    `${window.location.origin}/lucanus.png`,
         link:        { mobileWebUrl: url, webUrl: url },
       },

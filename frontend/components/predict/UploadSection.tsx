@@ -145,7 +145,7 @@ export function UploadSection() {
         {state === "idle" && (
           <>
             <h1 className="text-4xl font-black tracking-tight leading-none">
-              <span className="text-amber-400 text-glow">루카</span>덱스
+              <span className="text-amber-400 text-glow">비틀</span>덱스
             </h1>
             <p className="text-sm text-muted-foreground">
               사진 한 장으로 한국 사슴벌레 16종을 즉시 동정

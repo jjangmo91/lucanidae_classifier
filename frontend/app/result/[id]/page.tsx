@@ -20,12 +20,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const name   = spInfo?.ko ?? data.species?.replace(/_/g, " ") ?? "사슴벌레";
     const pct    = data.confidence ? `${(data.confidence * 100).toFixed(1)}%` : "";
     const title  = `${name} 동정 결과`;
-    const desc   = `AI 신뢰도 ${pct} · 루카덱스에서 동정한 ${name}`;
+    const desc   = `AI 신뢰도 ${pct} · 비틀덱스에서 동정한 ${name}`;
 
     return {
       title,
-      openGraph: { title: `${name} | LucaDex`, description: desc },
-      twitter:   { title: `${name} | LucaDex`, description: desc },
+      openGraph: { title: `${name} | BeetleDex`, description: desc },
+      twitter:   { title: `${name} | BeetleDex`, description: desc },
     };
   } catch {
     return { title: "동정 결과" };

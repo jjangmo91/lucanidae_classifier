@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "루카덱스",
-    short_name: "LucaDex",
+    name: "비틀덱스",
+    short_name: "BeetleDex",
     description: "한국 사슴벌레 16종 AI 동정 서비스",
     start_url: "/",
     display: "standalone",

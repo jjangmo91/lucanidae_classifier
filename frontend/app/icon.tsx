@@ -29,7 +29,6 @@ export default function Icon() {
             background: "radial-gradient(circle, rgba(245,158,11,0.2) 0%, transparent 70%)",
           }}
         />
-        {/* 루카 텍스트 */}
         <div
           style={{
             display: "flex",
@@ -47,7 +46,7 @@ export default function Icon() {
               letterSpacing: "-8px",
             }}
           >
-            루
+            비
           </span>
           <span
             style={{

@@ -77,7 +77,7 @@ export default async function OGImage({ params }: Props) {
               textTransform: "uppercase",
             }}
           >
-            LucaDex · 동정 결과
+            BeetleDex · 동정 결과
           </div>
 
           {/* 희귀도 배지 */}

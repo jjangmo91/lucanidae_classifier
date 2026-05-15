@@ -25,7 +25,7 @@ export default function AppleIcon() {
           }}
         >
           <span style={{ fontSize: 96, fontWeight: 900, color: "#f59e0b", lineHeight: 1 }}>
-            루
+            비
           </span>
           <span style={{ fontSize: 30, fontWeight: 700, color: "rgba(245,158,11,0.55)", letterSpacing: "4px" }}>
             DEX

@@ -49,7 +49,7 @@ export default function OGImage() {
               letterSpacing: "-2px",
             }}
           >
-            루카
+            비틀
           </span>
           <span
             style={{
@@ -74,7 +74,7 @@ export default function OGImage() {
             textTransform: "uppercase",
           }}
         >
-          LucaDex
+          BeetleDex
         </div>
 
         {/* 설명 */}

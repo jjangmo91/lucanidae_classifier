@@ -42,7 +42,7 @@ export function NavBar() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/lucanus.png" alt="" className="w-7 h-7 object-contain opacity-90 group-hover:opacity-100 transition-opacity" />
           <span className="font-black text-base tracking-tight">
-            <span className="text-amber-400">루카</span>
+            <span className="text-amber-400">비틀</span>
             <span className="text-foreground/80">덱스</span>
           </span>
         </Link>

@@ -1,4 +1,4 @@
-# 루카덱스 (LucaDex)
+# 비틀덱스 (BeetleDex)
 
 **한국 사슴벌레과(Lucanidae) 16종 AI 동정 + 채집 커뮤니티**
 
