@@ -32,6 +32,7 @@ __pycache__/
 # Frontend
 frontend/node_modules/
 frontend/.next/
+frontend/.env.local
 
 # Docker
 .docker/

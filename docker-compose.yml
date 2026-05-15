@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
     env_file: .env
     depends_on:
       db:
@@ -12,8 +10,8 @@ services:
       redis:
         condition: service_started
     volumes:
-      - ./models:/app/models:ro    # 모델 웨이트 마운트 (읽기전용)
-      - ./data/uploads:/app/data/uploads  # 업로드 이미지 영속 저장
+      - ./models:/app/models:ro
+      - ./data/uploads:/app/data/uploads
 
   frontend:
     build:
@@ -23,14 +21,12 @@ services:
       - "3000:3000"
     env_file: ./frontend/.env.local
     environment:
-      - BACKEND_URL=http://api:8000   # docker 내부 서비스명으로 통신
+      - BACKEND_URL=http://api:8000
     depends_on:
       - api
 
   db:
     image: postgres:16-alpine
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB:       lucanidae
       POSTGRES_USER:     lucanidae
@@ -50,7 +46,7 @@ services:
   mlflow:
     image: ghcr.io/mlflow/mlflow:latest
     ports:
-      - "5001:5000"
+      - "127.0.0.1:5001:5000"
     volumes:
       - mlflow_data:/mlflow
     command: >
@@ -63,7 +59,7 @@ services:
   label-studio:
     image: heartexlabs/label-studio:latest
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     environment:
       LABEL_STUDIO_LOCAL_FILES_SERVING_ENABLED: "true"
       LABEL_STUDIO_LOCAL_FILES_DOCUMENT_ROOT: /label-studio/files
@@ -74,7 +70,7 @@ services:
   cloudflared:
     image: cloudflare/cloudflared:latest
     command: tunnel run
-    env_file: .env                 # TUNNEL_TOKEN 필요
+    env_file: .env
 
 volumes:
   db_data:

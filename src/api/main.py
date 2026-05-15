@@ -25,7 +25,7 @@ from src.ml.manager import ModelManager
 _cors_origins = [o.strip() for o in os.getenv("CORS_ORIGINS", "http://localhost:3000").split(",")]
 
 app = FastAPI(
-    title="LucaDex API",
+    title="BeetleDex API",
     version="1.0.0",
     docs_url="/docs" if os.getenv("ENV", "development") == "development" else None,
     redoc_url=None,
