@@ -45,6 +45,7 @@ python-multipart>=0.0.9        # FastAPI 파일 업로드
 # DB
 sqlalchemy[asyncio]>=2.0.0
 asyncpg>=0.29.0                # PostgreSQL async 드라이버
+psycopg2-binary>=2.9.0         # alembic 마이그레이션용 동기 드라이버
 alembic>=1.13.0                # DB 마이그레이션
 
 # Cache / Rate limit
