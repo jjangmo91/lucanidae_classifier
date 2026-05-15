@@ -1,5 +1,5 @@
 # ------------------------------------------
-# Lucanidae Classifier Training Requirements
+# Lucanidae Classifier — Full Requirements
 # ------------------------------------------
 
 # Data Collection & Processing
@@ -13,12 +13,43 @@ pillow>=10.0.0
 PyYAML>=6.0
 scikit-learn>=1.2.0
 python-dotenv>=1.0.0
-wandb>=0.16.0
+mlflow>=2.11.0
 
 # Analysis & Visualization
 matplotlib>=3.7.0
 seaborn>=0.12.0
 
-# Deep Learning (Note: Manual install recommended for CUDA)
-# torch>=2.2.0
-# torchvision>=0.17.0
+# Deep Learning (CUDA 환경에 맞게 별도 설치 권장)
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu124
+# torch>=2.6.0
+# torchvision>=0.21.0
+# pip install xformers
+# xformers>=0.0.29   # DINOv2/ViT 계열 Transformer 최적화
+
+# Detection Pipeline (CUDA 의존성이 크므로 별도 설치)
+# pip install ultralytics
+# pip install autodistill autodistill-grounded-sam
+# pip install label-studio label-studio-converter
+ultralytics>=8.0.0
+autodistill>=0.1.0
+autodistill-grounded-sam>=0.1.0
+label-studio-converter>=0.0.50
+
+# ----------------------------------------
+# Backend (FastAPI + DB)
+# ----------------------------------------
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9        # FastAPI 파일 업로드
+
+# DB
+sqlalchemy[asyncio]>=2.0.0
+asyncpg>=0.29.0                # PostgreSQL async 드라이버
+alembic>=1.13.0                # DB 마이그레이션
+
+# Cache / Rate limit
+redis>=5.0.0
+
+# Validation
+pydantic>=2.7.0
+pydantic-settings>=2.3.0       # .env 설정 관리

@@ -1,6 +1,46 @@
 # configs/default.yaml
+
 data_collection:
-  taxon_id: 49083           # 사슴벌레과 고유 ID
-  place_id: 6891            # 대한민국 고유 ID
+  taxon_id: 49083           # 사슴벌레과 iNaturalist taxon ID
+  place_id: 6891            # 대한민국 iNaturalist place ID
   max_pages: 10             # 최대 수집 페이지 수 (페이지당 200건)
   output_dir: "./data/raw/inaturalist"
+
+data_preprocessing:
+  inaturalist_metadata: "./data/raw/inaturalist/metadata.csv"
+  field_metadata:       "./data/raw/field_data/field_metadata.csv"
+  merged_metadata:      "./data/raw/merged_metadata.csv"
+  processed_dir:        "./data/processed"
+  final_dir:            "./data/final"
+  min_samples:          10
+
+training:
+  data_dir:       "./data/final"
+  architecture:   "swin_tiny"
+  mode:           "species_only"
+  run_name:       "swin_full_SO_s456_v1"
+  batch_size:     16
+  num_epochs:     100
+  learning_rate:  0.0001
+  patience:       10
+  weights_path:   "./models/weights/sweep/swin_full_SO_s456.pth"
+
+inference:
+  preprocessing_mode:   "full"                             # full | bbox | seg_hard | seg_soft
+  fallback_mode:        "full"                             # 미검출 시 사용할 모드
+  confidence_threshold: 0.40                               # 이하면 low_confidence 처리
+  ood_threshold:        0.65                               # 이상이면 uncertain 처리
+  ood_centroid_path:    "models/weights/ood_centroids.pt"  # build_ood_centroids.py로 생성
+
+detection:
+  annotation_source: "./data/final"              # 자동 어노테이션할 이미지 소스 (data/final 전체)
+  annotation_dir:    "./data/annotations"        # Grounded SAM 2 어노테이션 출력
+  detector_train:    "./data/detector_train"     # YOLO seg 학습용 split 디렉토리
+  segmented_dir:     "./data/final_seg_hard"      # 세그먼트 crop → 분류기 재학습용 (generate_segmented.py 출력 경로)
+  weights_path:      "./models/weights/best_detector.pt"
+  architecture:      "yolov8n-seg"
+  num_epochs:        100
+  confidence:        0.25                        # 추론 시 confidence threshold
+  iou_threshold:     0.45                        # NMS IoU threshold
+  val_split:         0.15                        # annotation → detector_train 분할 비율
+  prompt:            "stag beetle"               # Grounded SAM 2 텍스트 프롬프트

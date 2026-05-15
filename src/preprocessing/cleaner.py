@@ -8,53 +8,95 @@ from tqdm import tqdm
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
+
 class DataCleaner:
     def __init__(self, config_path: str = "configs/default.yaml", taxonomy_path: str = "configs/taxonomy.yaml"):
-        self.base_path = Path(".")
-        
-        # 설정 파일 로드
         with open(config_path, "r", encoding="utf-8") as f:
-            self.config = yaml.safe_load(f)
+            config = yaml.safe_load(f)
         with open(taxonomy_path, "r", encoding="utf-8") as f:
-            self.taxonomy_config = yaml.safe_load(f)
+            taxonomy = yaml.safe_load(f)
 
-        self.raw_metadata_path = Path(self.config['data_collection']['output_dir']) / "metadata.csv"
-        self.processed_dir = self.base_path / "data/processed"
-        
-        self.taxonomy_map = self.taxonomy_config['taxonomy_mapping']
-        self.unidentified_list = self.taxonomy_config['unidentified_groups']
+        prep = config["data_preprocessing"]
+        self.merged_metadata_path = Path(prep["merged_metadata"])
+        self.processed_dir        = Path(prep["processed_dir"])
+
+        self.target_classes    = set(taxonomy["target_classes"])
+        self.name_mapping      = taxonomy["scientific_name_mapping"]
+        self.exclusion_list    = set(taxonomy["exclusion_list"])
+
+    def _resolve_class(self, raw_name: str) -> str | None:
+        """학명 → canonical 클래스명 변환. 제외 대상이면 None 반환."""
+        if raw_name in self.exclusion_list:
+            return None
+
+        # 직접 매핑
+        if raw_name in self.name_mapping:
+            return self.name_mapping[raw_name]
+
+        # 공백을 언더스코어로 변환한 형태가 target_classes에 있으면 그대로 사용
+        normalized = raw_name.replace(" ", "_")
+        if normalized in self.target_classes:
+            return normalized
+
+        # 매핑 없음
+        return None
 
     def process(self):
-        """데이터 정제 및 물리적 분류 실행"""
-        if not self.raw_metadata_path.exists():
-            logger.error(f"Metadata not found at {self.raw_metadata_path}")
+        if not self.merged_metadata_path.exists():
+            logger.error(f"Merged metadata not found: {self.merged_metadata_path}")
+            logger.error("먼저 merger.py를 실행하세요.")
             return
 
-        df = pd.read_csv(self.raw_metadata_path)
+        df = pd.read_csv(self.merged_metadata_path, encoding="utf-8-sig")
         self.processed_dir.mkdir(parents=True, exist_ok=True)
 
-        success_count = 0
-        logger.info("Starting taxonomic data consolidation using YAML config...")
+        success, skipped_excluded, skipped_unmapped, skipped_missing = 0, 0, 0, 0
+        unmapped_names: set[str] = set()
 
-        for _, row in tqdm(df.iterrows(), total=len(df), desc="Classifying"):
-            raw_name = row['scientific_name']
-            
-            # Taxonomy mapping 적용
-            target_name = self.taxonomy_map.get(raw_name, raw_name.replace(" ", "_"))
+        logger.info(f"총 {len(df)}건 처리 시작...")
 
-            # Unidentified 그룹 처리
-            if target_name in self.unidentified_list:
-                target_name = "Unidentified_Lucanidae"
+        for _, row in tqdm(df.iterrows(), total=len(df), desc="Cleaning"):
+            raw_name   = str(row["scientific_name"]).strip()
+            image_path = Path(str(row["image_path"]))
 
-            target_path = self.processed_dir / target_name
-            target_path.mkdir(parents=True, exist_ok=True)
+            # 제외 목록 확인
+            if raw_name in self.exclusion_list:
+                skipped_excluded += 1
+                continue
 
-            source_img = Path(row['image_path'])
-            if source_img.exists():
-                shutil.copy(source_img, target_path / source_img.name)
-                success_count += 1
+            # canonical 클래스명 결정
+            canonical = self._resolve_class(raw_name)
+            if canonical is None:
+                skipped_unmapped += 1
+                unmapped_names.add(raw_name)
+                continue
 
-        logger.info(f"Consolidation completed. Processed: {success_count} images.")
+            # target_classes 외 클래스 경고
+            if canonical not in self.target_classes:
+                logger.warning(f"target_classes 외 클래스 생성됨: '{canonical}' (원본: '{raw_name}')")
+
+            # 이미지 복사
+            if not image_path.exists():
+                skipped_missing += 1
+                continue
+
+            target_dir = self.processed_dir / canonical
+            target_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy(image_path, target_dir / image_path.name)
+            success += 1
+
+        logger.info(
+            f"완료 — 복사: {success}건 | "
+            f"제외(exclusion): {skipped_excluded}건 | "
+            f"매핑 없음: {skipped_unmapped}건 | "
+            f"파일 없음: {skipped_missing}건"
+        )
+
+        if unmapped_names:
+            logger.warning(f"매핑되지 않은 학명 목록 ({len(unmapped_names)}개):")
+            for name in sorted(unmapped_names):
+                logger.warning(f"  - '{name}'")
+
 
 if __name__ == "__main__":
     cleaner = DataCleaner()

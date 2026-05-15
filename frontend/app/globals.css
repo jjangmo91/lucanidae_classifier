@@ -1,0 +1,111 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 222 47% 4%;
+    --foreground: 40 55% 93%;
+
+    --primary: 43 96% 56%;
+    --primary-foreground: 222 47% 4%;
+
+    --secondary: 142 60% 12%;
+    --secondary-foreground: 40 55% 93%;
+
+    --muted: 222 35% 10%;
+    --muted-foreground: 222 15% 50%;
+
+    --accent: 222 40% 12%;
+    --accent-foreground: 40 55% 93%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 222 30% 14%;
+    --input: 222 30% 14%;
+    --ring: 43 96% 56%;
+    --radius: 0.75rem;
+
+    --card: 222 42% 7%;
+    --card-foreground: 40 55% 93%;
+  }
+
+  * { @apply border-border; }
+
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse 100% 40% at 50% 0%, hsl(43 60% 10% / 0.5) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 30% at 85% 85%, hsl(142 40% 8% / 0.35) 0%, transparent 55%);
+    background-attachment: fixed;
+  }
+}
+
+@layer utilities {
+  .glow-amber {
+    box-shadow:
+      0 0 0 1px hsl(43 96% 56% / 0.25),
+      0 0 24px hsl(43 96% 56% / 0.22),
+      0 0 70px hsl(43 96% 56% / 0.09);
+  }
+
+  .glow-amber-sm {
+    box-shadow: 0 0 14px hsl(43 96% 56% / 0.35);
+  }
+
+  .text-glow {
+    text-shadow:
+      0 0 25px hsl(43 96% 56% / 0.8),
+      0 0 60px hsl(43 96% 56% / 0.35);
+  }
+
+  .scan-line {
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      hsl(43 96% 56% / 0.08) 44%,
+      hsl(43 96% 56% / 0.45) 50%,
+      hsl(43 96% 56% / 0.08) 56%,
+      transparent 100%
+    );
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 3px,
+      rgba(0, 0, 0, 0.06) 3px,
+      rgba(0, 0, 0, 0.06) 4px
+    );
+  }
+
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
+  }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-9px); }
+}
+
+@keyframes scanMove {
+  0%   { transform: translateY(-100%); }
+  100% { transform: translateY(200%); }
+}
+
+@keyframes bounce-bar {
+  0%, 80%, 100% { transform: scaleY(0.35); opacity: 0.35; }
+  40%           { transform: scaleY(1.1);  opacity: 1; }
+}
+
+@keyframes pulse-ring {
+  0%   { transform: scale(1);   opacity: 0.55; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+
+@keyframes fill-bar {
+  from { width: 0; }
+}

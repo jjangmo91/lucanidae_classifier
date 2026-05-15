@@ -1,24 +1,154 @@
 # configs/taxonomy.yaml
-taxonomy_mapping:
-  # 아종 -> 종 통합
-  "Serrognathus titanus castanicolor": "Serrognathus_titanus"
-  "Serrognathus titanus": "Serrognathus_titanus"
-  "Prosopocoilus inclinatus inclinatus": "Prosopocoilus_inclinatus"
-  "Prosopocoilus inclinatus": "Prosopocoilus_inclinatus"
-  "Dorcus rectus rectus": "Dorcus_rectus"
-  "Dorcus rectus": "Dorcus_rectus"
-  "Dorcus hopei binodulosus": "Dorcus_hopei"
-  "Dorcus hopei": "Dorcus_hopei"
-  "Dorcus rubrofemoratus chenpengi": "Dorcus_rubrofemoratus"
-  "Dorcus rubrofemoratus": "Dorcus_rubrofemoratus"
-  
-  # 속(Genus) 단위 통합
-  "Lucanus": "Lucanus_dybowski"
-  "Serrognathus": "Serrognathus_titanus"
-  "Prosopocoilus": "Prosopocoilus_inclinatus"
-  "Dorcus": "Dorcus_rectus"
+# 기준: 국립생물자원관 국가생물종목록 (Lucanidae, 16종)
 
-unidentified_groups:
+# ============================================================
+# Section 1: 16종 정규 클래스 정의
+# 학습 디렉토리명 및 모델 출력 레이블의 기준
+# ============================================================
+target_classes:
+  - Prosopocoilus_astacoides_blanchardi   # 두점박이사슴벌레
+  - Dorcus_titanus_castanicolor           # 넓적사슴벌레
+  - Lucanus_maculifemoratus_dybowskyi     # 사슴벌레
+  - Dorcus_hopei_binodulosus             # 왕사슴벌레
+  - Prosopocoilus_inclinatus_inclinatus   # 톱사슴벌레
+  - Dorcus_rectus_rectus                 # 애사슴벌레
+  - Dorcus_rubrofemoratus_rubrofemoratus # 홍다리사슴벌레
+  - Prismognathus_dauricus               # 다우리아사슴벌레
+  - Dorcus_carinulatus_koreanus          # 털보왕사슴벌레
+  - Platycerus_hongwonpyoi_hongwonpyoi   # 원표애보라사슴벌레
+  - Dorcus_consentaneus_consentaneus     # 참넓적사슴벌레
+  - Aegus_laevicollis_subnitidus         # 꼬마넓적사슴벌레
+  - Nigidius_miwai                       # 뿔꼬마사슴벌레
+  - Dorcus_tenuihirsutus                 # 엷은털왕사슴벌레
+  - Figulus_punctatus                    # 길쭉꼬마사슴벌레
+  - Figulus_binodulus                    # 큰꼬마사슴벌레
+
+# ============================================================
+# Section 2: iNaturalist 학명 variants → canonical 매핑
+# iNaturalist 수집 데이터의 다양한 표기 (구 학명, 아종 미기재 등)를
+# Section 1의 정규 클래스명으로 통일
+# ============================================================
+scientific_name_mapping:
+
+  # --- 넓적사슴벌레 ---
+  # Serrognathus 속은 Dorcus의 동의어로 처리됨
+  "Serrognathus titanus":               "Dorcus_titanus_castanicolor"
+  "Serrognathus titanus castanicolor":  "Dorcus_titanus_castanicolor"
+  "Dorcus titanus":                     "Dorcus_titanus_castanicolor"
+  "Dorcus titanus castanicolor":        "Dorcus_titanus_castanicolor"
+
+  # --- 사슴벌레 ---
+  # 종명 변경: dybowski/dybowskyi → maculifemoratus dybowskyi
+  "Lucanus dybowski":                          "Lucanus_maculifemoratus_dybowskyi"
+  "Lucanus dybowskyi":                         "Lucanus_maculifemoratus_dybowskyi"
+  "Lucanus maculifemoratus":                   "Lucanus_maculifemoratus_dybowskyi"
+  "Lucanus maculifemoratus dybowskyi":         "Lucanus_maculifemoratus_dybowskyi"
+  "Lucanus maculifemoratus dybowskyi Parry":   "Lucanus_maculifemoratus_dybowskyi"
+
+  # --- 왕사슴벌레 ---
+  "Dorcus hopei":                       "Dorcus_hopei_binodulosus"
+  "Dorcus hopei binodulosus":           "Dorcus_hopei_binodulosus"
+
+  # --- 톱사슴벌레 ---
+  "Prosopocoilus inclinatus":                    "Prosopocoilus_inclinatus_inclinatus"
+  "Prosopocoilus inclinatus inclinatus":         "Prosopocoilus_inclinatus_inclinatus"
+
+  # --- 두점박이사슴벌레 ---
+  "Prosopocoilus astacoides":                    "Prosopocoilus_astacoides_blanchardi"
+  "Prosopocoilus astacoides blanchardi":         "Prosopocoilus_astacoides_blanchardi"
+
+  # --- 애사슴벌레 ---
+  "Dorcus rectus":                      "Dorcus_rectus_rectus"
+  "Dorcus rectus rectus":               "Dorcus_rectus_rectus"
+
+  # --- 홍다리사슴벌레 ---
+  "Dorcus rubrofemoratus":                       "Dorcus_rubrofemoratus_rubrofemoratus"
+  "Dorcus rubrofemoratus rubrofemoratus":        "Dorcus_rubrofemoratus_rubrofemoratus"
+
+  # --- 다우리아사슴벌레 ---
+  "Prismognathus dauricus":             "Prismognathus_dauricus"
+
+  # --- 털보왕사슴벌레 ---
+  # 구 학명: Dorcus koreanus
+  "Dorcus koreanus":                    "Dorcus_carinulatus_koreanus"
+  "Dorcus carinulatus":                 "Dorcus_carinulatus_koreanus"
+  "Dorcus carinulatus koreanus":        "Dorcus_carinulatus_koreanus"
+
+  # --- 원표애보라사슴벌레 ---
+  "Platycerus hongwonpyoi":                      "Platycerus_hongwonpyoi_hongwonpyoi"
+  "Platycerus hongwonpyoi hongwonpyoi":          "Platycerus_hongwonpyoi_hongwonpyoi"
+
+  # --- 참넓적사슴벌레 ---
+  # Serrognathus 속은 Dorcus의 동의어로 처리됨
+  "Serrognathus consentaneus":                   "Dorcus_consentaneus_consentaneus"
+  "Serrognathus consentaneus consentaneus":      "Dorcus_consentaneus_consentaneus"
+  "Dorcus consentaneus":                         "Dorcus_consentaneus_consentaneus"
+  "Dorcus consentaneus consentaneus":            "Dorcus_consentaneus_consentaneus"
+
+  # --- 꼬마넓적사슴벌레 ---
+  "Aegus laevicollis":                  "Aegus_laevicollis_subnitidus"
+  "Aegus laevicollis subnitidus":       "Aegus_laevicollis_subnitidus"
+  "Aegus subnitidus":                   "Aegus_laevicollis_subnitidus"
+
+  # --- 뿔꼬마사슴벌레 ---
+  "Nigidius":                           "Nigidius_miwai"
+  "Nigidius miwai":                     "Nigidius_miwai"
+
+  # --- 엷은털왕사슴벌레 ---
+  "Dorcus tenuihirsutus":               "Dorcus_tenuihirsutus"
+
+  # --- 길쭉꼬마사슴벌레 ---
+  "Figulus punctatus":                  "Figulus_punctatus"
+
+  # --- 큰꼬마사슴벌레 ---
+  "Figulus binodulus":                  "Figulus_binodulus"
+
+# ============================================================
+# Section 3: 한국어 일반명 → canonical 매핑
+# field_metadata.csv의 species 컬럼(한국어) 처리용
+# ============================================================
+korean_name_mapping:
+  "두점박이사슴벌레":   "Prosopocoilus_astacoides_blanchardi"
+  "넓적사슴벌레":      "Dorcus_titanus_castanicolor"
+  "사슴벌레":         "Lucanus_maculifemoratus_dybowskyi"
+  "왕사슴벌레":       "Dorcus_hopei_binodulosus"
+  "톱사슴벌레":       "Prosopocoilus_inclinatus_inclinatus"
+  "애사슴벌레":       "Dorcus_rectus_rectus"
+  "홍다리사슴벌레":    "Dorcus_rubrofemoratus_rubrofemoratus"
+  "다우리아사슴벌레":  "Prismognathus_dauricus"
+  "털보왕사슴벌레":    "Dorcus_carinulatus_koreanus"
+  "원표애보라사슴벌레": "Platycerus_hongwonpyoi_hongwonpyoi"
+  "참넓적사슴벌레":    "Dorcus_consentaneus_consentaneus"
+  "꼬마넓적사슴벌레":  "Aegus_laevicollis_subnitidus"
+  "뿔꼬마사슴벌레":    "Nigidius_miwai"
+  "엷은털왕사슴벌레":  "Dorcus_tenuihirsutus"
+  "길쭉꼬마사슴벌레":  "Figulus_punctatus"
+  "큰꼬마사슴벌레":    "Figulus_binodulus"
+  # 홍원표비단사슴벌레는 원표애보라사슴벌레의 구 국명
+  "홍원표비단사슴벌레": "Platycerus_hongwonpyoi_hongwonpyoi"
+
+# ============================================================
+# Section 4: 제외 목록
+# 비한국종, 속명 단독 미동정, 한국 미서식 아종 등
+# cleaner.py가 이 목록에 해당하면 해당 이미지를 학습에서 제외
+# ============================================================
+exclusion_list:
+  # 비한국종
+  - "Mesotopus tarandus"
+  - "Velutinodorcus"
+  - "Dorcus tenuecostatus"
+  # 중국 아종 (한국 미서식)
+  - "Dorcus rubrofemoratus chenpengi"
+  # 속명 단독 기록 (어느 종인지 불명확)
+  - "Lucanus"
+  - "Dorcus"
+  - "Prosopocoilus"
+  - "Serrognathus"
+  - "Figulus"
+  - "Prismognathus"
+  - "Aegus"
+  - "Platycerus"
+  # 과/아과 단위 미동정
   - "Lucanidae"
   - "Lucanini"
   - "Stag Beetles"

@@ -1,0 +1,24 @@
+<View>
+  <Image name="image" value="$image"/>
+
+  <Header value="종 정보 (자동)"/>
+  <Text name="species_info" value="$species"/>
+
+  <Header value="성별 선택"/>
+  <Choices name="sex" toName="image" choice="single" required="true">
+    <Choice value="male" alias="수컷"/>
+    <Choice value="female" alias="암컷"/>
+    <Choice value="unknown" alias="모름"/>
+  </Choices>
+
+  <Header value="수컷 형태 (수컷일 때만)"/>
+  <Choices name="male_form" toName="image" choice="single"
+           visibleWhen="choice-selected"
+           whenTagName="sex"
+           whenChoiceValue="수컷">
+    <Choice value="major" alias="대형(뿔 김)"/>
+    <Choice value="minor" alias="소형(뿔 짧음)"/>
+    <Choice value="intermediate" alias="중간형"/>
+    <Choice value="unknown" alias="모름"/>
+  </Choices>
+</View>

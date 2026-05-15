@@ -1,54 +1,62 @@
 """
-Main Entry Point - Smart Pipeline Edition
-이미 완료된 단계는 자동으로 스킵하고, 변경사항이 필요한 단계만 실행합니다.
+Main Entry Point — Lucanidae Data Pipeline
+16종 분류 기준: 국립생물자원관 국가생물종목록
+
+Step 1  : Scraper          — 수동 데이터 보호를 위해 비활성화 유지
+Step 1.5: DataMerger       — iNaturalist + field_data → merged_metadata.csv
+Step 2  : DataCleaner      — merged_metadata.csv → data/processed/ (16-class)
+Step 3  : DatasetSplitter  — data/processed/ → data/final/ (train/val/test)
 """
 
 import logging
+import shutil
 from pathlib import Path
+
 from src.data_collection.scraper import main as run_scraper
+from src.preprocessing.merger import DataMerger
 from src.preprocessing.cleaner import DataCleaner
 from src.preprocessing.splitter import DatasetSplitter
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 logger = logging.getLogger(__name__)
 
-def run_pipeline(force_update=False):
-    logger.info("=== Starting Lucanidae Data Pipeline ===")
 
-    # 설정 경로 정의
-    metadata_csv = Path("data/raw/inaturalist/metadata.csv")
-    processed_dir = Path("data/processed")
-    final_dir = Path("data/final")
+def run_pipeline():
+    logger.info("=== Lucanidae Data Pipeline 시작 ===")
 
-    # Step 1: Data Collection
-    # [CRITICAL] 수동 데이터 정제 후에는 절대 scraper를 실행하지 않습니다.
-    # 기존: if not metadata_csv.exists() or force_update:
-    # 수정: 아래처럼 조건을 강제로 False로 처리합니다.
-    if False: # 수동 정제 데이터 보호를 위해 일시적으로 비활성화
-        logger.info("Step 1: Metadata not found. Starting Scraper...")
-        run_scraper()
-    else:
-        logger.info("Step 1: Manual cleaning mode. Skipping Scraper to protect raw data.")
+    # Step 1: Data Collection (비활성화)
+    # [중요] 수동 정제 데이터 보호를 위해 Scraper를 실행하지 않습니다.
+    logger.info("Step 1: Scraper — 수동 정제 모드, 건너뜀")
+
+    # Step 1.5: Data Merge
+    logger.info("Step 1.5: DataMerger 시작 — iNaturalist + field_data 통합")
+    merger = DataMerger()
+    merger.merge()
 
     # Step 2: Taxonomic Cleaning
-    # 정제된 데이터를 다시 분류 체계에 맞게 배치합니다.
-    # 기존 processed_dir를 삭제하고 돌리는 것이 안전합니다.
-    logger.info("Step 2: Starting Taxonomic Cleaning...")
+    # data/processed/ 를 초기화 후 재구성합니다.
+    processed_dir = Path("data/processed")
+    if processed_dir.exists():
+        logger.info("Step 2: 기존 data/processed/ 초기화 중...")
+        shutil.rmtree(processed_dir)
+
+    logger.info("Step 2: DataCleaner 시작 — 16-class 기준 분류")
     cleaner = DataCleaner()
     cleaner.process()
 
     # Step 3: Dataset Splitting
-    # 정제된 데이터를 바탕으로 train/val/test 세트를 다시 구성합니다.
-    logger.info("Step 3: Starting Dataset Splitting...")
+    # data/final/ 을 초기화 후 재구성합니다.
+    final_dir = Path("data/final")
+    if final_dir.exists():
+        logger.info("Step 3: 기존 data/final/ 초기화 중...")
+        shutil.rmtree(final_dir)
+
+    logger.info("Step 3: DatasetSplitter 시작 — train/val/test 분할")
     splitter = DatasetSplitter(min_samples=10)
     splitter.split()
 
-    logger.info("=== Pipeline Execution Completed ===")
+    logger.info("=== Pipeline 완료 ===")
+
 
 if __name__ == "__main__":
-    # [주의] 수동으로 사진을 지운 후에는 force_update와 상관없이 
-    # Step 1이 실행되지 않도록 위 로직에서 제어해야 합니다.
-    run_pipeline(force_update=True)
+    run_pipeline()
