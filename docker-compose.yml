@@ -28,13 +28,13 @@ services:
   db:
     image: postgres:16-alpine
     environment:
-      POSTGRES_DB:       lucanidae
-      POSTGRES_USER:     lucanidae
+      POSTGRES_DB:       beetledex
+      POSTGRES_USER:     beetledex
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U lucanidae"]
+      test: ["CMD-SHELL", "pg_isready -U beetledex"]
       interval: 5s
       timeout: 3s
       retries: 5
