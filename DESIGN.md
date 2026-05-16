@@ -1,7 +1,7 @@
 # 한국 사슴벌레 AI 도감 — 설계 문서 v6
 
 > 최종 수정: 2026-05-10
-> 기준 코드베이스: `lucanidae_classifier` (main 브랜치)
+> 기준 코드베이스: `beetledex` / GitHub: `jjangmo91/lucanidae_classifier` (main 브랜치)
 
 ---
 
@@ -519,7 +519,7 @@ python scripts/analyze_results.py
 → Prosopocoilus inclinatus가 가장 불안정 — 학습 샘플 절대 부족이 원인. flywheel 데이터 확장 시 우선 수집 대상.
 → 산출물: `experiments/error_analysis/{true}_pred_{pred}/` 폴더별 오분류 이미지
 
-### Phase 5 — 웹서비스 배포 + Flywheel (진행 중, 2026-05-11~)
+### Phase 5 — 웹서비스 배포 + Flywheel (2026-05-11~)
 
 #### 핵심 비전
 웹서비스 배포 → 커뮤니티 데이터 수집 → 모델 재학습의 flywheel 구조.
@@ -534,7 +534,8 @@ python scripts/analyze_results.py
 ```
 
 #### Phase 5 작업
-- [ ] 웹서비스 배포 (Docker + Contabo VPS)
+- [x] 웹서비스 배포 (Docker + Contabo VPS + Cloudflare Tunnel) — beetledex.com 운영중 (2026-05-16)
+- [ ] Google 로그인 OAuth Redirect URI 등록 완료 후 소셜 로그인 활성화
 - [ ] 커뮤니티 데이터 수집 시작 (~4,000장 목표)
 - [ ] 4,000장 도달 시 learning curve 분석 (데이터 50%/75%/100% 성능 변화)
 - [ ] OOD detection 강화 (외래종 이미지 수집 후 재학습)
@@ -545,10 +546,10 @@ python scripts/analyze_results.py
 > 사슴벌레과는 사례 연구이며, 동일 프레임워크를 나비·잠자리·식물 등 타 분류군에 즉시 적용 가능.
 
 ### Phase 6 — 서비스 완성 (예정)
-- [ ] Cloudflare R2 이미지 저장
-- [ ] GPS 분포 지도
-- [ ] 관리자 대시보드
-- [ ] Contabo VPS 배포
+- [ ] Cloudflare R2 이미지 저장 (현재: 서버 로컬 data/uploads/)
+- [ ] GPS 분포 지도 (전체 공개 핀 — 현재는 본인 핀만)
+- [ ] 관리자 대시보드 고도화
+- [ ] 모델 재학습 자동화 파이프라인
 
 ---
 
@@ -565,7 +566,7 @@ python scripts/analyze_results.py
 | Auto-annotation | autodistill + Grounded SAM 2 |
 | Experiment tracking | MLflow (localhost:5001, SQLite backend) |
 | GPU | RTX 4060 Laptop 8GB, CUDA 12.4 |
-| Deploy | Docker Compose, Contabo VPS (예정) |
+| Deploy | Docker Compose, Contabo VPS (Singapore), Cloudflare Tunnel |
 
 ---
 
