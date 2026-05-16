@@ -275,12 +275,29 @@ $env:PYTHONPATH = "."; python scripts/build_ood_centroids.py
 
 | 서비스 | 용도 | 상태 |
 |--------|------|------|
-| Contabo VPS M | 서빙 서버 | 예정 |
-| Cloudflare Tunnel | HTTPS | 예정 |
+| Contabo VPS (싱가포르) | 서빙 서버 | 운영중 |
+| Cloudflare Tunnel | HTTPS — beetledex.com | 운영중 |
 | PostgreSQL 16 | 메인 DB | Docker |
 | Redis 7 | 캐시 | Docker |
-| MLflow | 실험 추적 | Docker |
-| Label Studio | 데이터 레이블링 | Docker |
+| MLflow | 실험 추적 | Docker (localhost:5001) |
+| Label Studio | 데이터 레이블링 | Docker (localhost:8081) |
+
+### 프로덕션 배포
+
+```bash
+# 서버 Docker 전체 실행
+docker compose up -d
+
+# DB 마이그레이션 (최초 1회 또는 스키마 변경 시)
+docker compose exec api alembic upgrade head
+
+# 로그 확인
+docker compose logs -f api
+docker compose logs -f frontend
+```
+
+> Cloudflare Tunnel이 `beetledex.com → frontend:3000` 트래픽을 처리합니다.  
+> API 포트(8000)와 DB 포트(5432)는 외부에 노출되지 않습니다.
 
 ---
 
