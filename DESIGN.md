@@ -155,24 +155,37 @@ L_total = L_species + λ_sex · L_sex + λ_form · L_male_form
 | 모드 | 설명 | 데이터 경로 |
 |------|------|------------|
 | `full` | 원본 그대로 | `data/final` |
-| `bbox` | BBox crop (배경 포함) | `data/final_bbox` |
-| `seg_hard` | Binary 마스크 + 회색 배경 | `data/final_seg_hard` |
-| `seg_soft` | Alpha blending + 회색 배경 | `data/final_seg_soft` |
+| `bbox` | BBox crop — **패딩 없음** (src/ml/detector.py L83) | `data/final_bbox` |
+| `seg_hard` | Binary 마스크 + 회색 배경 + bbox crop | `data/final_seg_hard` |
+| `seg_soft` | Alpha blending + 회색 배경 + bbox crop | `data/final_seg_soft` |
 
-**전처리 ablation 결과 (3-seed 평균, val_acc 기준):**
+**⚠️ 구현 주의사항**: bbox/seg_hard/seg_soft 모두 YOLOv8 bbox 좌표로 패딩 없이 잘라냄.
+사슴벌레가 프레임을 꽉 채우도록 확대되어 자연스러운 스케일·구도가 손실됨.
+이것이 full > bbox 성능 차이의 주요 원인일 가능성이 있음 (N3 재해석).
 
-| 모드 | ConvNeXt SO | EfficientNet SO | Swin SO |
-|------|------------|----------------|---------|
-| full | **81.3%** | **84.0%** | **77.6%** |
-| seg_soft | 64.5% | 68.3% | 60.6% |
-| seg_hard | 65.5% | 65.5% | 60.6% |
-| bbox | 65.7% | 72.0% | 62.5% |
+**전처리 ablation 결과 (3-seed 평균, val_acc / test_acc):**
 
-→ val_acc 기준 full이 전 아키텍처에서 우위 (ViT 제외, ViT는 갭 ~2%p).
-→ 원인 단정 불가: 세그멘테이션 과정에서 진단 형질 손실 / 데이터 부족 노이즈 / 배경 편향 등 복합 작용 가능성.
-→ 아키텍처별 패턴: DINOv2는 ViT 구조임에도 갭 17.9%p (DINO 사전학습이 공간 맥락 활용 능력 부여).
-→ GradCAM: Prismognathus 1종에서 배경 편향 확인 — 전 아키텍처/종에 대한 일반화 불가.
-→ test set 전처리별 비교는 미수행 — 논문 작성 시 eval_all_prep.py로 추가 평가 필요.
+| 모드 | EfficientNet | ConvNeXt | Swin | DINOv2 | ViT |
+|------|------------|----------|------|--------|-----|
+| full (val) | **84.0%** | **81.3%** | **77.6%** | **72.1%** | **64.0%** |
+| full (test) | **72.7%** | **68.8%** | **71.2%** | **63.5%** | 53.1% |
+| bbox (test) | 68.9% | 62.2% | 60.1% | 51.3% | 60.0% |
+| seg_soft (test) | 65.9% | 59.0% | 57.5% | 51.6% | **62.4%** |
+| seg_hard (test) | 62.8% | 60.6% | 58.7% | 51.3% | 56.9% |
+
+**핵심 발견:**
+1. **CNN + DINOv2**: test에서도 full 우위 유지. 배경 정보 자체보다 자연스러운 스케일·구도 보존이 주된 요인으로 추정.
+2. **ViT 역전**: test에서 full(53.1%) < seg_soft(62.4%). ViT full 이미지에서 배경 shortcut 학습 → test 실패. seg_soft val≈test(갭 0.5%p) = 진짜 성능.
+3. **ViT bbox/seg 우위의 역설**: 패딩 없는 크롭이 오히려 배경 shortcut 기회를 제거해 일반화를 도움.
+4. **val-test 갭**: full 전처리에서 6~13%p, seg 전처리에서 0.5~5%p로 작음. full이 val에서만 유리한 측면 존재.
+
+**후속 실험 아이디어** (논문 작성 시):
+- bbox + 20~30% 패딩 추가 → 자연스러운 스케일 유지 시 성능 회복 여부 확인
+- 전처리별 test_acc는 `experiments/test_results/prep_ablation/`에 저장됨 (eval_all_prep.py 완료)
+- full이 진짜 배경 정보를 활용하는지 vs 스케일 보존 효과인지는 패딩 실험으로만 분리 가능
+
+→ GradCAM: Prismognathus 1종에서 배경 편향 확인. 단, ViT test 역전이 배경 shortcut의 더 강력한 증거.
+→ 원인 최종 단정 불가 — 패딩 실험 및 데이터 확장 후 재검증 필요.
 
 ### 3.4 전체 실험 설계
 
