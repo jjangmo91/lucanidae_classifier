@@ -168,8 +168,11 @@ L_total = L_species + λ_sex · L_sex + λ_form · L_male_form
 | seg_hard | 65.5% | 65.5% | 60.6% |
 | bbox | 65.7% | 72.0% | 62.5% |
 
-→ full이 전 아키텍처에서 15~30%p 우위. 배경/전체 맥락이 종 판별에 유효하거나, 세그멘테이션 과정에서 형태 진단 특징이 손실됨.
-→ GradCAM 분석 결과: 일부 케이스(Prismognathus)에서 흰 트레이 배경 테두리에 히트맵 집중 — 배경 편향 확인. 해당 종은 학습 데이터 대부분이 동일 배경으로 구성된 것이 원인. 데이터 다양성 확보(flywheel)로 해결 예정.
+→ val_acc 기준 full이 전 아키텍처에서 우위 (ViT 제외, ViT는 갭 ~2%p).
+→ 원인 단정 불가: 세그멘테이션 과정에서 진단 형질 손실 / 데이터 부족 노이즈 / 배경 편향 등 복합 작용 가능성.
+→ 아키텍처별 패턴: DINOv2는 ViT 구조임에도 갭 17.9%p (DINO 사전학습이 공간 맥락 활용 능력 부여).
+→ GradCAM: Prismognathus 1종에서 배경 편향 확인 — 전 아키텍처/종에 대한 일반화 불가.
+→ test set 전처리별 비교는 미수행 — 논문 작성 시 eval_all_prep.py로 추가 평가 필요.
 
 ### 3.4 전체 실험 설계
 
@@ -198,7 +201,7 @@ python scripts/sweep_lambda.py
 - seed=42 고정 (하이퍼파라미터 민감도 분석은 단일 seed 표준)
 - 목적: λ 값이 cherry-pick되지 않았음을 증명
 
-**총 137개 실험**
+**총 149개 실험** (메인 120 + MT Ablation 6 + SX Ablation 12 + λ Ablation 11)
 
 **최종 실험 결과 (3-seed 평균, full 전처리, val_acc 기준):**
 
