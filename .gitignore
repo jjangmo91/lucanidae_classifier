@@ -39,3 +39,7 @@ frontend/.env.local
 
 # Claude Code workspace (personal, not project files)
 .claude/
+
+# Presentation artifacts (large binaries, regenerable from scripts/make_ppt*.py)
+*.pptx
+*.pdf
