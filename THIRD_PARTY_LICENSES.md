@@ -80,7 +80,41 @@ DESIGN.md 4.8 에서 이미 **검출기 재학습을 M0 필수 항목으로 잡�
 | HuggingFace `transformers` DETR / RT-DETR | Apache-2.0 | 학습 코드가 단순함 |
 | YOLOX | Apache-2.0 | YOLO 계열 유지 원할 때 |
 
-우리 용도는 **클래스 무관(class-agnostic) 단일 객체 검출**이라 난이도가 낮다.
+### 교체 시 반드시 지켜야 할 조건 — 인스턴스 분할이어야 한다
+
+**단순 검출기로 바꾸면 안 된다.** 전처리 모드 중 `seg_hard` 와 `seg_soft` 는
+박스가 아니라 **마스크**를 쓴다 (`src/ml/detector.py` 의 `_extract_crops`).
+마스크가 없으면 코드가 조용히 bbox crop 으로 폴백하도록 되어 있어서,
+박스만 주는 모델로 갈아끼우면 **4개 전처리 모드 중 2개가 bbox 와 동일해진다.**
+E0(전처리 비교)의 절반이 사라지는 것이므로 반드시 인스턴스 분할 모델을 골라야 한다.
+
+| 모델 | 라이선스 | 마스크 | 판단 |
+|------|---------|--------|------|
+| torchvision `maskrcnn_resnet50_fpn` | BSD-3 | **제공** | **권장.** 이미 torchvision 의존 중이라 추가 설치 없음 |
+| Detectron2 Mask R-CNN | Apache-2.0 | 제공 | 설치가 다소 무거움 |
+| HuggingFace `transformers` Mask2Former | Apache-2.0 | 제공 | 가능 |
+| torchvision `fasterrcnn` | BSD-3 | 없음 | **부적합** |
+| YOLOX | Apache-2.0 | 없음(검출 전용) | **부적합** |
+
+### 교체에 따르는 작업
+
+| 항목 | 내용 | 비고 |
+|------|------|------|
+| 어노테이션 변환 | 현재 `data/annotations/` 는 YOLO 폴리곤 형식. COCO 폴리곤으로 변환 필요 | 기계적 변환, 정보 손실 없음 |
+| 학습 스크립트 | `train_detector.py` 가 전부 ultralytics 기반이라 재작성 | |
+| 가중치 | `models/weights/best_detector.pt` 폐기 | 어차피 과분할로 재학습 예정 |
+| crop 데이터 재생성 | `data/final_bbox`, `final_seg_hard`, `final_seg_soft` 전부 | 어차피 재생성 예정 (DESIGN.md 4.8) |
+| `detector.py` | ultralytics `result.boxes` / `result.masks` 접근부를 교체 | 인터페이스는 유지 가능 |
+
+### 기존 설계와 충돌하지 않는다
+
+- **v6 crop 데이터와의 비교 불가?** 문제되지 않는다. v6 결과는 이미 전량 폐기했다 (DESIGN.md 3.4).
+- **전처리 비교(E0)가 흔들리나?** 오히려 반대다. 모든 crop 기반 모드가 같은 검출기에
+  의존하므로, 검출기 품질이 올라가면 비교가 더 공정해진다. 과분할 조각이 빠지는 것도 E0 에 이득이다.
+- **어노테이션 도구는?** autodistill / Grounded SAM 은 설치 환경 검사에서 강한 카피레프트가
+  아니었다. 오프라인 어노테이션 도구라 배포물에 포함되지도 않는다.
+
+우리 용도는 **클래스 무관(class-agnostic) 단일 객체 분할**이라 난이도가 낮다.
 YOLOv8n-seg 의 성능이 꼭 필요한 상황이 아니다.
 
 ---
