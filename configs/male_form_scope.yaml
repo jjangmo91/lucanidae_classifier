@@ -1,0 +1,33 @@
+# configs/male_form_scope.yaml
+# male_form 판정 대상 종 관리
+# 규칙: docs/male_form_protocol.md · 근거: DESIGN.md 4.4
+#
+# 종별 분위수(Q30/Q70)를 추정하려면 라벨된 수컷이 충분해야 한다.
+# 미달 종은 not_applicable 로 두고 masked loss 에서 제외한다.
+# 수집이 진행되어 min_labeled_males 를 넘으면 in_scope 로 옮긴다.
+
+min_labeled_males: 30
+
+# 분위수 경계 (민감도 분석 시 alternatives 도 함께 산출)
+quantiles:
+  lower: 0.30
+  upper: 0.70
+alternatives:
+  - [0.25, 0.75]
+  - [0.33, 0.67]
+
+# 판정 대상 — 라벨된 수컷 30개체 이상 확보된 종
+in_scope:
+  - Dorcus_titanus_castanicolor           # 넓적사슴벌레
+  - Prosopocoilus_inclinatus_inclinatus   # 톱사슴벌레
+  - Dorcus_rectus_rectus                  # 애사슴벌레
+  - Lucanus_maculifemoratus_dybowskyi     # 사슴벌레
+  - Prismognathus_dauricus                # 다우리아사슴벌레
+
+# 판정 제외 — not_applicable 로 기록되고 학습에서 마스킹됨
+not_applicable:
+  Platycerus_hongwonpyoi_hongwonpyoi:     "큰턱 다형성이 문헌상 뚜렷하지 않음"
+  Dorcus_consentaneus_consentaneus:       "라벨된 수컷 30개체 미만"
+  Prosopocoilus_astacoides_blanchardi:    "라벨된 수컷 30개체 미만"
+  Dorcus_hopei_binodulosus:               "라벨된 수컷 30개체 미만"
+  Dorcus_rubrofemoratus_rubrofemoratus:   "라벨된 수컷 30개체 미만"

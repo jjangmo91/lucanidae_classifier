@@ -1,0 +1,43 @@
+<!--
+  male_form 계측용 Label Studio 템플릿
+  판정 규칙: docs/male_form_protocol.md
+  근거:      DESIGN.md 4.4
+
+  라벨러는 등급(major/minor/intermediate)을 고르지 않는다. 점 4개만 찍는다.
+  등급은 scripts/compute_male_form.py 가 종별 분위수로 자동 산출한다.
+-->
+<View>
+  <Header value="1. 종 (자동 표시)"/>
+  <Text name="species_info" value="$species"/>
+
+  <Header value="2. 성별"/>
+  <Choices name="sex" toName="image" choice="single" required="true">
+    <Choice value="male"    alias="수컷"/>
+    <Choice value="female"  alias="암컷"/>
+    <Choice value="unknown" alias="모름"/>
+  </Choices>
+
+  <Header value="3. 계측 가능 여부 (수컷일 때만)"/>
+  <Choices name="measurable" toName="image" choice="single"
+           visibleWhen="choice-selected" whenTagName="sex" whenChoiceValue="수컷">
+    <Choice value="yes" alias="계측 가능 - 아래 점 4개를 찍으세요"/>
+    <Choice value="occluded"      alias="제외: 큰턱/몸통이 가려짐"/>
+    <Choice value="foreshortened" alias="제외: 각도가 비스듬해 길이가 왜곡됨"/>
+    <Choice value="damaged"       alias="제외: 큰턱이 좌우 비대칭 손상"/>
+    <Choice value="not_applicable" alias="제외: 판정 대상 종이 아님"/>
+  </Choices>
+
+  <Header value="4. 계측점 4개 (배면/측면 온전할 때만)"/>
+  <Text name="guide" value="M = 큰턱선단-큰턱기부 · B = 전흉배판앞-초시끝 · R = M/B"/>
+  <Image name="image" value="$image" zoom="true" zoomControl="true"/>
+  <KeyPointLabels name="kp" toName="image" strokeWidth="3" opacity="0.9">
+    <Label value="mandible_apex" background="#e84a3f" hint="큰턱 선단(끝)"/>
+    <Label value="mandible_base" background="#f2a03d" hint="큰턱이 두순에 붙는 지점"/>
+    <Label value="body_front"    background="#2f7fd1" hint="전흉배판 앞 가장자리 중앙"/>
+    <Label value="body_rear"     background="#3aa06a" hint="초시 끝 중앙"/>
+  </KeyPointLabels>
+
+  <Header value="5. 비고 (선택)"/>
+  <TextArea name="note" toName="image" rows="2" editable="true"
+            placeholder="판단이 애매했던 이유 등"/>
+</View>

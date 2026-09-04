@@ -26,9 +26,10 @@ M0를 건너뛰고 실험을 돌리면 v6와 같은 이유로 결과가 무효�
 - [ ] 배경·촬영자 상관 검사 스크립트 `check_split_confounds.py` (§4.2)
 
 ### 라벨 프로토콜
-- [ ] `docs/male_form_protocol.md` 작성 (§4.4)
-- [ ] Label Studio 템플릿을 keypoint 계측 방식으로 교체 (§4.4)
-- [ ] `scripts/compute_male_form.py` — R 비율 산출 + 종별 분위수 3분류 (§4.4)
+- [x] `docs/male_form_protocol.md` 작성 (§4.4)
+- [x] Label Studio 템플릿을 keypoint 계측 방식으로 교체 (§4.4) — `configs/label_studio_male_form.xml`
+- [x] `scripts/compute_male_form.py` — R 비율 산출 + 종별 분위수 3분류 (§4.4)
+      -> 대상 종은 `configs/male_form_scope.yaml` 에서 관리. 합성 데이터로 동작 검증 완료
 - [ ] 진단 형질 표 v1 + **형질별 가시성 등급** (E4·라벨링 공용) (§12.5)
 
 ### 공개·재현성
@@ -37,7 +38,7 @@ M0를 건너뛰고 실험을 돌리면 v6와 같은 이유로 결과가 무효�
 - [ ] `LICENSE` 파일 추가 — 코드/데이터 분리 표기 (§11.5)
 - [ ] ND 34장 학습 사용 여부 결정 (제외 권장), ARR 638장은 배포 금지 명시 (§11.5)
 - [ ] `environment.yml` 고정 + CUDA·하드웨어 기록 (§11.5)
-- [ ] MLflow run을 CSV로 export해 커밋 (§11.5)
+- [x] MLflow run을 CSV로 export해 커밋 (§11.5) — `results/v6_mlflow/` 149 runs
 - [ ] `docs/adversarial_review.md` — 22개 시나리오 (§6.5)
 - [ ] 국내 법정보호종 지정 확인 → 해당 시 좌표 격자화 (§11.5)
 - [ ] 관찰자 ID 해시화 (§11.5)
