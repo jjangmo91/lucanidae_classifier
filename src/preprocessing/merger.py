@@ -30,6 +30,14 @@ class DataMerger:
             "observed_on":     df["observed_on"],
             "source":          "inaturalist",
             "quality_grade":   df.get("quality_grade", pd.Series(["unknown"] * len(df))),
+
+            # 저작권 정보는 반드시 끝까지 끌고 간다 (DESIGN.md 11.2).
+            # 여기서 흘리면 어떤 이미지를 공개할 수 있는지 판단할 수 없게 된다.
+            "photo_id":            df.get("photo_id", pd.Series([None] * len(df))),
+            "photo_license":       df.get("photo_license", pd.Series(["UNKNOWN"] * len(df))),
+            "photo_attribution":   df.get("photo_attribution", pd.Series([None] * len(df))),
+            "observation_license": df.get("observation_license", pd.Series(["UNKNOWN"] * len(df))),
+            "obscured":            df.get("obscured", pd.Series([None] * len(df))),
         })
 
     def _load_field(self) -> pd.DataFrame:
@@ -45,6 +53,14 @@ class DataMerger:
             "observed_on":     df["observed_on"],
             "source":          "field",
             "quality_grade":   "field",
+
+            # 현장 촬영분은 직접 촬영이므로 배포 조건을 우리가 정한다.
+            # 3층 테스트셋 공개를 위해 CC-BY 를 기본값으로 둔다 (DESIGN.md 11.4).
+            "photo_id":            None,
+            "photo_license":       df.get("photo_license", pd.Series(["cc-by"] * len(df))),
+            "photo_attribution":   df.get("photo_attribution", pd.Series([None] * len(df))),
+            "observation_license": df.get("photo_license", pd.Series(["cc-by"] * len(df))),
+            "obscured":            False,
         })
 
     def merge(self):

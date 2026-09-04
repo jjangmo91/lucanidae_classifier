@@ -105,7 +105,8 @@ class INaturalistScraper:
                 continue
 
             # 고해상도(large) 이미지 URL 추출
-            img_url = photos[0].get("url", "").replace("square", "large")
+            photo = photos[0]
+            img_url = photo.get("url", "").replace("square", "large")
             if not img_url:
                 continue
 
@@ -139,7 +140,17 @@ class INaturalistScraper:
                 "quality_grade": obs.get("quality_grade"),             # 검증 등급
                 "positional_accuracy": obs.get("positional_accuracy"), # 위치 오차(m)
                 "user_id": obs.get("user", {}).get("login"),           # 관찰자
-                "image_path": str(img_path.resolve())
+                "image_path": str(img_path.resolve()),
+
+                # --- 저작권 (DESIGN.md 11.2) ---
+                # license_code 가 None 이면 All Rights Reserved 이며 재배포할 수 없다.
+                # 수집 시점에 반드시 기록해야 한다. 관찰은 삭제되거나 라이선스가
+                # 바뀔 수 있어 나중에는 복구되지 않는다.
+                "photo_id": photo.get("id"),
+                "photo_license": photo.get("license_code") or "ALL_RIGHTS_RESERVED",
+                "photo_attribution": photo.get("attribution"),
+                "observation_license": obs.get("license_code") or "ALL_RIGHTS_RESERVED",
+                "obscured": obs.get("obscured"),
             })
 
         # 메타데이터 CSV 저장 (Silver Layer)

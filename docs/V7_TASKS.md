@@ -35,8 +35,10 @@ M0를 건너뛰고 실험을 돌리면 v6와 같은 이유로 결과가 무효�
 - [ ] 진단 형질 표 v1 + **형질별 가시성 등급** (E4·라벨링 공용) (§12.5)
 
 ### 공개·재현성
-- [ ] 이미지 라이선스 백필 — `scraper.py` 컬럼 추가 + 기존 2,000건 역조회 (§11.5)
-      -> 역조회 결과는 `data/raw/inaturalist/photo_licenses.csv`에 이미 있음 (gitignore, 백업 없음)
+- [x] 이미지 라이선스 백필 — `scraper.py` 컬럼 추가 + 기존 2,000건 역조회 (§11.5)
+      -> `scraper.py`/`merger.py`에 photo_id·photo_license·photo_attribution·obscured 추가
+      -> 기존 2,000건 병합 완료. `merged_metadata.csv`에 반영됨
+      -> 재배포 가능 1,326 / ARR 640 / ND 34
 - [ ] `LICENSE` 파일 추가 — 코드/데이터 분리 표기 (§11.5)
 - [ ] ND 34장 학습 사용 여부 결정 (제외 권장), ARR 638장은 배포 금지 명시 (§11.5)
 - [ ] `environment.yml` 고정 + CUDA·하드웨어 기록 (§11.5)
