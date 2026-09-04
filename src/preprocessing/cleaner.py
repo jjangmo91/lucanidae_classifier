@@ -1,5 +1,8 @@
 import pandas as pd
 import shutil
+
+# 파생물 배포가 금지되어 학습에서도 제외하는 라이선스 (DESIGN.md 11.5)
+EXCLUDED_LICENSES = {"cc-by-nc-nd", "cc-by-nd"}
 import logging
 import yaml
 from pathlib import Path
@@ -51,6 +54,7 @@ class DataCleaner:
         self.processed_dir.mkdir(parents=True, exist_ok=True)
 
         success, skipped_excluded, skipped_unmapped, skipped_missing = 0, 0, 0, 0
+        skipped_license = 0
         unmapped_names: set[str] = set()
 
         logger.info(f"총 {len(df)}건 처리 시작...")
@@ -62,6 +66,15 @@ class DataCleaner:
             # 제외 목록 확인
             if raw_name in self.exclusion_list:
                 skipped_excluded += 1
+                continue
+
+            # 라이선스 제외 (DESIGN.md 11.5)
+            # ND(NoDerivatives)는 파생물 배포가 금지된다. crop/seg 가 명백한
+            # 파생물이므로 다툼의 여지를 없애기 위해 학습에서도 제외한다.
+            # 전체의 1.7% 라 잃는 것이 없다.
+            # ARR 은 학습에 쓰되 재배포하지 않는다 (여기서 거르지 않는다).
+            if str(row.get("photo_license", "")).strip().lower() in EXCLUDED_LICENSES:
+                skipped_license += 1
                 continue
 
             # canonical 클래스명 결정
@@ -88,6 +101,7 @@ class DataCleaner:
         logger.info(
             f"완료 — 복사: {success}건 | "
             f"제외(exclusion): {skipped_excluded}건 | "
+            f"제외(라이선스 ND): {skipped_license}건 | "
             f"매핑 없음: {skipped_unmapped}건 | "
             f"파일 없음: {skipped_missing}건"
         )

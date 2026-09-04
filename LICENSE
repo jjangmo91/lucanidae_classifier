@@ -1,0 +1,40 @@
+MIT License
+
+Copyright (c) 2026 BeetleDex / Lucanidae Classifier contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+NOTE ON SCOPE
+
+This MIT license covers the source code authored in this repository.
+It does NOT cover:
+
+  - Third-party dependencies. See THIRD_PARTY_LICENSES.md — in particular
+    the detection component depends on AGPL-3.0 licensed software, which
+    imposes conditions on redistribution and network use of the combined work.
+
+  - Image data. Images collected from iNaturalist remain under the license
+    each photographer chose (CC0 / CC BY / CC BY-NC / CC BY-NC-SA /
+    CC BY-NC-ND / All Rights Reserved). They are NOT redistributed by this
+    repository. See DESIGN.md section 11.
+
+  - Derived data products (labels, measurements, embeddings, result tables)
+    authored by this project, which are released under CC BY 4.0.
