@@ -29,15 +29,26 @@ SEX_CLASSES       = ["male", "female", "unknown"]
 MALE_FORM_CLASSES = ["major", "minor", "intermediate", "unknown"]
 
 
+def _label_key(path: str | Path) -> str:
+    """{species}/{filename} 키를 만든다.
+
+    split(train/val/test)을 키에 넣지 않는다. sex_labels.csv는 과거 split 기준으로
+    작성돼 있어서, splitter를 재실행해 분할이 바뀌면 split을 포함한 키는 매칭에 실패한다.
+    (실측: 1,985건 중 649건이 split 변경으로 유실되어 조용히 unknown 처리되고 있었음)
+    파일명은 {observation_id}_{name} 형식이라 전역 고유하므로 species/filename으로 충분하다.
+    """
+    parts = Path(path).parts
+    return "/".join(parts[-2:]) if len(parts) >= 2 else Path(path).as_posix()
+
+
 def _load_sex_labels(csv_path: str) -> dict[str, dict]:
-    """sex_labels.csv → {split/species/filename: {sex, male_form}} 딕셔너리.
-    앞 부분(data/final, data/final_segmented 등)을 제거해 전처리 모드에 무관하게 매칭."""
+    """sex_labels.csv → {species/filename: {sex, male_form}} 딕셔너리.
+    앞 부분(data/final, data/final_bbox 등)과 split을 제거해
+    전처리 모드·분할 변경에 무관하게 매칭."""
     labels = {}
     with open(csv_path, "r", encoding="utf-8") as f:
         for row in csv.DictReader(f):
-            parts = Path(row["local_path"]).parts
-            key = "/".join(parts[-3:]) if len(parts) >= 3 else Path(row["local_path"]).as_posix()
-            labels[key] = {
+            labels[_label_key(row["local_path"])] = {
                 "sex":       row["sex"],
                 "male_form": row["male_form"],
             }
@@ -66,9 +77,9 @@ class MultiTaskDataset(Dataset):
         img  = self.transform(img)
 
         # CSV has relative paths (data/final/split/species/file), ImageFolder gives absolute paths
-        parts = Path(img_path).parts
-        key   = "/".join(parts[-3:]) if len(parts) >= 3 else Path(img_path).as_posix()
-        info  = self._sex_labels.get(key, {"sex": "unknown", "male_form": "unknown"})
+        info = self._sex_labels.get(
+            _label_key(img_path), {"sex": "unknown", "male_form": "unknown"}
+        )
 
         sex_idx  = SEX_CLASSES.index(info["sex"]) if info["sex"] in SEX_CLASSES else 2
         form_idx = MALE_FORM_CLASSES.index(info["male_form"]) if info["male_form"] in MALE_FORM_CLASSES else 3
