@@ -18,7 +18,9 @@ M0를 건너뛰고 실험을 돌리면 v6와 같은 이유로 결과가 무효�
 
 ### 데이터 무결성 (최우선, 서로 의존)
 - [x] 라벨 키를 split 독립으로 교체 (§4.3) — `src/training/dataset.py`
-- [ ] **다중검출 205장 검수** — 한 마리 / 여러 마리 / 오검출 판정 (§4.8.3-a)
+- [~] **다중검출 205장 검수** — 한 마리 / 여러 마리 / 오검출 판정 (§4.8.3-a)
+      -> 검수 큐 생성 완료: `experiments/multi_detect_review/` (이미지 205장 + review_queue.csv)
+      -> **사람이 verdict 칸을 채우는 작업이 남음.** `scripts/review_multi_detect.py` 로 재생성 가능
 - [ ] **detector 어노테이션 재검수 및 재학습** — 과분할 원인 제거 (§4.8.3-f)
 - [ ] **crop 매니페스트 `data/labels/crops.csv` 도입** — ImageFolder 디렉토리=라벨 방식 폐기 (§4.8.3-b)
       -> 위 두 항목이 선행되어야 함
