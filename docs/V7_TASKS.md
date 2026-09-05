@@ -46,6 +46,11 @@ M0를 건너뛰고 실험을 돌리면 v6와 같은 이유로 결과가 무효�
       -> **검색표를 읽어 내용을 채우는 작업이 남음.** NIBR2014 확보 필요
 
 ### 공개·재현성
+- [x] **논문 그림용 사진 제약 확인** (§11.7) — Elsevier 는 타인 저작물 게재에 서면 허락 요구
+      -> NC 는 상업 출판사 지면과 충돌. 그림 가능 **222장뿐** (현장 153 + cc-by 63 + cc0 6)
+      -> `scripts/analysis/figure_eligible.py` 로 재계산. 후보 목록은 experiments/analysis_v7/
+- [ ] 그림용 사진 확정 후 `docs/figure_image_whitelist.csv` 작성 (출처표시 문자열 포함)
+      -> 두점박이·왕·원표애보라는 후보가 1장뿐이라 선택의 여지가 없다
 - [x] 이미지 라이선스 백필 — `scraper.py` 컬럼 추가 + 기존 2,000건 역조회 (§11.5)
       -> `scraper.py`/`merger.py`에 photo_id·photo_license·photo_attribution·obscured 추가
       -> 기존 2,000건 병합 완료. `merged_metadata.csv`에 반영됨

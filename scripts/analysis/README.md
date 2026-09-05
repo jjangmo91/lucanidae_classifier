@@ -13,6 +13,7 @@ DESIGN.md v7에 인용된 수치를 산출한 스크립트다.
 | `power_analysis.py` | 테스트셋 크기별 검정력·신뢰구간 계산. | §12.1 |
 | `collection_targets.py` | 통계 요건에서 역산한 종별 수집 목표와 부족분. | §13 |
 | `check_label_coverage.py` | 성별·형태 라벨의 실제 매칭률 점검 (split 키 유실 진단). | §4.3 |
+| `figure_eligible.py` | 논문 그림에 실을 수 있는 사진 집계 + 후보 목록 | §11.7 |
 
 출력은 `experiments/analysis_v7/` 에 저장된다 (gitignore 대상).
 
