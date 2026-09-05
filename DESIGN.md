@@ -25,6 +25,7 @@
 | 배경·위치 | full 우위를 맥락 정보로 해석 | **배경 불변성을 요구사항으로 고정.** 위치는 모델에서 배제 | §3.3 |
 | v6 실험 결과 | 예비 실험으로 보존 | **전량 폐기.** 라벨 유실·조각 오염·검정력 부족으로 무효 | §3.4 |
 | 수집 목표 | 종당 test 20장 | **종당 175-370개체 3단계 목표** | §13 |
+| 투고처 | MEE (primary) | **Ecological Informatics 로 교체.** MEE 가 단일 분류군 연구를 명시 배제 | §6, §6.6 |
 
 **v7에서 새로 확정된 3개 항목** (v6 초안의 미해결 목록):
 1. 종 수 정합 → §1.3 — 16/13/10 3단 어휘 확정, 논문은 10-way로 서술
@@ -918,36 +919,97 @@ crop 단위가 추가되므로, 그룹 키는 `observation_id`를 유지하고 c
 
 ---
 
-## 6. 논문 구성 [개정]
+## 6. 논문 구성 [개정 — Ecological Informatics 형식]
+
+**투고처: Ecological Informatics (Elsevier).** 선정 근거는 §6.6.
+Original Research Paper **또는 case study**로 투고한다. 두 유형 모두 정식 article type이다.
 
 > 가제: **"How Much Data, Which Strategy, and What Do Models See?
-> A Template for Classifying Expert-Domain Taxa, Exemplified by Korean Stag Beetles"**
+> Fine-Grained Classification of a Data-Poor, Sexually Dimorphic Insect Family"**
+>
+> MEE용 부제였던 "A Template for Classifying Expert-Domain Taxa"는 내린다.
+> 템플릿 주장은 제2 분류군 반복 없이는 방어되지 않는다(§12.6-D). 지금은 사례 연구로 쓴다.
+
+### 6.1 원고 구조
+
+Elsevier 관행에 따라 **번호를 매긴 절**로 구성한다 (1, 1.1, 1.1.1).
 
 ```
-1. Introduction — 전문가 영역 분류군 문제, FM 시대의 지역 소규모 데이터
-2. Related Work — FGVC/곤충, 데이터 효율성·학습곡선, 생물 FM(BioCLIP 1·2), XAI 정합, 이형성 x DL
-3. Dataset
-   3.1 참조 종목록 16 → 수집 13 → 모델링 10 (§1.3, 롱테일을 출발점으로 서술)
-   3.2 3층 구조와 오염 방어 (§4.5)
-   3.3 라벨 체계 + κ/ICC (§4.3, §4.4)
-   3.4 Specimen-level split과 그 한계 (§4.2 — 관찰당 1장 사실 명시)
-   3.5 사진 동정의 한계 (암컷 조합) 선제 서술
-4. Method — 공정 비교 프로토콜, 전처리 x aspect, 멀티태스크(마스킹 loss), BioCLIP 트랙, 정합 지표
-5. Experiments — E0 → E1 → E2 → E3 → E4 (+E5·E6 분석 절)
-6. Results & Discussion — 교차점 권고표, 형질 vs 배경, 이형성 취약성, 희귀종 사각지대,
-   템플릿 이식성(주장 수위: worked example + 공개 프로토콜)
-7. Conclusion
+1. Introduction
+   전문가 영역 분류군 문제, 파운데이션 모델 시대의 지역 소규모 데이터.
+   관련 연구를 여기에 녹이거나 별도 2절로 분리 (EI는 형식을 강제하지 않음).
+
+2. Materials and methods
+   2.1 Study taxon           참조 16 → 수집 13 → 모델링 10 (§1.3). 롱테일을 출발점으로 서술
+   2.2 Data sources          3층 구조, 오염 방어, 라이선스 구성 (§4.5, §11.2)
+   2.3 Labelling             성별·male_form 계측 프로토콜, kappa/ICC (§4.3, §4.4)
+   2.4 Data partitioning     specimen-level split과 그 한계 (§4.2 — 관찰당 1장 사실 명시)
+   2.5 Preprocessing         4모드 x aspect, 개체 단위 crop 매니페스트 (§3.3, §4.8)
+   2.6 Models and training   공정 비교 프로토콜, 멀티태스크, BioCLIP 트랙, 롱테일 기법 (§3.2, E8)
+   2.7 Evaluation            macro-F1 주지표, 반복 층화 CV, 부트스트랩 CI, 검정력 (§12.1, §12.9)
+
+3. Results
+   E0 전처리 → E1 아키텍처 → E8 롱테일 → E2 학습곡선 → E3 BioCLIP → E4 정합
+   E9 메타데이터 대조군, E10 전문가 베이스라인을 기준점으로 배치
+
+4. Discussion
+   종당 N장 권고, 이형성 취약성, 희귀종 사각지대, 사진 동정의 형질 가시성 한계,
+   이식 가능성(주장 수위: 사례 연구 + 공개 프로토콜)
+
+5. Conclusions
+
+Declaration of competing interests
+Declaration of generative AI and AI-assisted technologies in the manuscript preparation process
+CRediT authorship contribution statement
+Acknowledgements
+Data availability
+References
 ```
 
-**타겟**: Methods in Ecology and Evolution (primary, v6와 동일). 후보 전체는 §6.6.
-상향 조건: 전문가 벤치마크 확보 또는 타 분류군 축소 반복.
-E4 단독으로 FGVC 워크숍 프리페이퍼 옵션.
+### 6.2 Ecological Informatics 제출 요건 체크리스트
 
-**서술 수위 통제 (필수)**:
+| 항목 | 요구 | 상태 |
+|------|------|------|
+| **Highlights** | 3-5개 불릿, **각 85자 이내**(공백 포함), 별도 파일 | 필수. 미작성 |
+| 초록 | **250단어 이내**, 단독으로 읽혀야 함, 참고문헌 지양 | 미작성 |
+| Keywords | 1-7개. 여러 단어 조합 지양 | 미작성 |
+| 본문 분량 | 권장 7,000단어, **최대 10,000** | |
+| 절 번호 | 번호를 매기고 본문에서 번호로 상호 참조 | |
+| Graphical abstract | 권장(필수 아님). 531 x 1328 px 이상 | 선택 |
+| **생성형 AI 선언** | 참고문헌 앞 **별도 절**에 도구명과 사유 명시 | **필수. 본 연구는 해당됨** |
+| CRediT | 14개 역할로 저자 기여 기술 | 미작성 |
+| Competing interests | 선언 도구로 작성해 .docx 업로드 | 미작성 |
+| Funding | 지원 없으면 그렇게 명시 | 미작성 |
+| 참고문헌 | 저자-연도. 투고 시 형식 자유, 일관성만 요구 | |
+| 그림 | 300 dpi 이상, 개별 파일, 캡션 필수 | |
+| 심사 | **단일 익명**(저자 공개, 심사자 익명) | 익명화 작업 불필요 |
+| 데이터 | Option C — 저장소 기탁 필수, 불가 시 사유 설명 (§11) | |
+
+**생성형 AI 선언은 반드시 넣는다.** 본 연구는 설계 검토와 코드 작성에 LLM을 사용했다.
+Elsevier 양식은 다음과 같다.
+
+> During the preparation of this work the author(s) used [도구/서비스] in order to [사유].
+> After using this tool/service, the author(s) reviewed and edited the content as needed and
+> take(s) full responsibility for the content of the published article.
+
+AI 도구를 저자로 올릴 수 없고, 출력의 정확성과 독창성에 대한 책임은 전적으로 저자에게 있다.
+
+### 6.3 부수 투고 옵션
+
+- **Data in Brief 공동 투고** — 데이터셋 기술을 별도 논문으로 동시 투고하면 두 논문이
+  ScienceDirect에서 자동 연결된다. §11의 공개 패키지를 그대로 재사용할 수 있다.
+  단 APC가 별도로 붙는다. 3층 수집 완료 후 판단한다.
+- **SSRN 프리프린트** — EI가 무료 제공하며 사전 공개로 간주되지 않는다.
+  스쿠핑 방어(§6.5-6)에 쓸 수 있고 투고 결과에 영향을 주지 않는다.
+- **E4 단독 FGVC 워크숍 프리페이퍼** — 기존 옵션 유지.
+
+### 6.4 서술 수위 통제 (필수)
+
 - "16종 분류" 금지 → 10-way (§1.3)
 - specimen split이 부풀림을 막았다는 주장 금지 (§4.2)
 - male_form을 기여로 주장 금지 (재실험 전) (§4.4)
 - 1층 수치로 일반화·FM 우열 주장 금지 (§4.6)
+- **"템플릿" 주장 금지** → 제2 분류군 반복 전까지 사례 연구로 서술 (§12.6-D)
 
 ### 6.5 적대적 검토 요약
 
@@ -992,13 +1054,21 @@ E4 단독으로 FGVC 워크숍 프리페이퍼 옵션.
 
 | 저널 | IF | 분면 | 출판사 | 적합성 |
 |------|----|------|--------|--------|
-| **Ecological Informatics** | 8.5 | Q1 | Elsevier | **범위 최적합.** 이미지 기반 모니터링·데이터 집약 생태학이 명시 범위. IF도 MEE보다 높다 |
-| **Methods in Ecology and Evolution** | 5.7 | Q1 | Wiley (BES) | **프레이밍 최적합.** "템플릿·프로토콜·정량 지침"이 MEE의 편집 정체성 그 자체. §11이 이미 BES 정책 기준으로 설계됨 |
+| **Ecological Informatics** | 8.5 | Q1 | Elsevier | **1순위 확정.** 범위에 "digital image processing, machine and deep learning" 명시. article type에 **case studies 포함**. 분류군 폭 요구 없음 |
+| Methods in Ecology and Evolution | 5.7 | Q1 | Wiley (BES) | **후보에서 제외.** "단일 분류군·생태계에만 적용되는 방법은 기준을 충족하기 어렵다"고 저자 가이드라인에 명시. 기존 방법을 엮은 워크플로도 새 방법으로 보지 않음 |
 
-두 저널의 선택은 **IF(8.5 vs 5.7) 대 분야 내 평판**의 교환이다.
-생태학 방법론 분야에서 MEE의 위상이 더 높지만, 정량 평가에서는 Ecological Informatics가 유리하다.
-**권고: MEE를 1순위로 유지하되 Ecological Informatics를 즉시 대체 가능한 2순위로 준비한다.**
-두 저널 모두 데이터·코드 공개를 요구하므로 §11 패키지를 그대로 재사용할 수 있어 전환 비용이 낮다.
+**MEE를 후보에서 뺀 이유** — 저자 가이드라인이 두 문장으로 우리를 배제한다.
+> "Papers describing methods that apply only to a single taxon or ecosystem are
+> unlikely to meet these criteria."
+> "descriptions of workflows that link together existing methods generally are not
+> considered to be new methods."
+
+우리 연구는 단일 분류군이고 기존 방법을 엮은 워크플로에 가깝다. 둘 다 정면으로 걸린다.
+제2 분류군 반복(E11)을 완료하면 다시 후보가 되지만, 그 전에는 desk reject 위험이 크다.
+
+**Ecological Informatics 를 1순위로 확정한다.** IF가 더 높고(8.5 vs 5.7), 범위가 더 정확히 맞고,
+case study 가 정식 article type 이며, 분류군 폭을 요구하지 않는다.
+하이브리드 저널이라 구독 경로를 택하면 APC 를 피할 수 있다는 점도 MEE(gold OA, APC 필수)와 다르다.
 
 #### B군 — 조건부 후보 (Q1이지만 재프레이밍 필요)
 
@@ -1027,7 +1097,7 @@ E4 단독으로 FGVC 워크숍 프리페이퍼 옵션.
    Scientific Data 병행 투고가 열리고, 본 논문의 "주 결론 근거 데이터 전량 공개" 진술도 성립한다.
 3. **E4(attention-검색표 정합)는 분리 가능하다.** FGVC 워크숍 프리페이퍼로 먼저 내고
    본 논문에서 인용하는 경로를 유지한다 (§6).
-4. **APC**를 사전에 확인한다. MEE·Ecological Informatics는 하이브리드(구독 기반, OA 선택),
+4. **APC**를 사전에 확인한다. Ecological Informatics는 하이브리드(구독 기반, OA 선택),
    Scientific Data·Insects는 전면 OA로 APC가 발생한다.
 
 ---
@@ -1245,21 +1315,23 @@ train.py  train_detector.py  predict.py  pipeline.py  main.py
 투고 시 요구되는 데이터·코드 공개를 **사후 대응이 아니라 설계 제약으로** 앞당겨 반영한다.
 이 절의 결론 한 줄: **이미지를 재배포할 수 있다는 가정에 의존하지 않는다.**
 
-### 11.1 대상 저널 요구사항 (MEE / BES)
+### 11.1 대상 저널 요구사항 (Ecological Informatics)
 
 투고 직전 반드시 최신 author guidelines로 재확인할 것. 확인 시점 기준 요지:
 
 | 항목 | 요구 |
 |------|------|
-| Data Availability Statement | 필수. 데이터베이스명 + accession number 또는 DOI 명시 |
-| 아카이브 형태 | **DOI를 발급하는 영구 저장소 필요** (Zenodo, Dryad 등) |
-| GitHub | **단독 아카이브 불가.** GitHub은 가변이므로 Zenodo 스냅샷으로 DOI를 받아야 함 |
-| 코드 | 아카이브 대상. MEE는 방법론 저널이라 코드 비중이 특히 큼 |
-| 심사 단계 | **투고 시점에 익명 형태로 데이터·코드를 심사자에게 제공** (zip 업로드 또는 Dryad/Zenodo private-for-peer-review) |
-| 인용 | 데이터에 DOI가 있으면 참고문헌에 정식 데이터 인용 기재 |
+| 데이터 정책 | **Option C** — 관련 저장소에 기탁하고 논문에서 인용·링크한다. **불가능하면 공유할 수 없는 이유를 진술한다** |
+| research data 의 범위 | 관찰·실험 결과뿐 아니라 **소프트웨어, 코드, 모델, 알고리즘, 프로토콜, 방법**을 포함 |
+| 데이터 진술 | 투고 시 데이터 가용성을 반드시 진술. 공개 논문에 함께 실림 |
+| 데이터 인용 | 참고문헌에 `[dataset]` 표시와 함께 저자·제목·저장소·버전·연도·영구 식별자 기재 |
+| 아카이브 형태 | 특정 저장소를 강제하지 않음. **Zenodo DOI 는 여전히 권장** (버전 고정과 인용에 유리) |
+| 심사 단계 | **단일 익명 심사.** 저자가 공개되므로 익명화 작업이 필요 없다 |
+| 제3자 저작물 | 논문에 타인의 저작물을 실으면 **서면 허락 필요** (§11.4 그림 제약) |
 
-BES 저널 실태 조사(Cooper et al. 2026, MEE)에 따르면 데이터 아카이빙은 97%가 이행하지만
-**코드 아카이빙은 35%에 그친다.** 코드까지 갖추면 그 자체가 방어 포인트가 된다.
+참고로 생태학 저널 전반의 실태 조사(Cooper et al. 2026, MEE)에서 데이터 아카이빙은 97%가
+이행하지만 **코드 아카이빙은 35%에 그친다.** EI 는 code 를 research data 에 포함시키므로
+코드까지 제대로 갖추면 그 자체가 방어 포인트가 된다.
 
 ### 11.2 현재 상태 진단 (실측)
 
@@ -1407,12 +1479,13 @@ E7을 "조건부 P2"가 아니라 **공개 패키지의 필수 구성요소**로
 
 ### 11.6 심사 단계 대응
 
-- 투고 시 Zenodo 또는 Dryad의 **private-for-peer-review 링크**를 준비한다. 익명성이 요구되므로
-  GitHub 링크를 그대로 노출하지 않는다.
+- **단일 익명 심사이므로 익명화가 필요 없다.** GitHub·Zenodo 링크를 그대로 노출해도 된다.
+  MEE 기준으로 준비하려던 private-for-peer-review 절차는 불필요하다.
 - 데이터·코드 README를 심사자가 30분 안에 재현할 수 있는 수준으로 쓴다.
-  BES 조사에서 아카이브물의 15%가 열리지 않거나 찾을 수 없었다는 점을 역이용한다.
-- Data Availability Statement 초안에 **공개할 수 없는 부분(2층, ARR 이미지)과 그 이유,
-  그리고 대체 재현 경로(매니페스트·임베딩)를 명시**한다. 숨기지 않고 먼저 밝히는 편이 강하다.
+  선행 조사에서 아카이브물의 15%가 열리지 않거나 찾을 수 없었다는 점을 역이용한다.
+- 데이터 진술에 **공개할 수 없는 부분(2층, ARR 이미지)과 그 이유, 그리고 대체 재현 경로
+  (매니페스트·임베딩)를 명시**한다. EI 의 Option C 는 "공유할 수 없으면 이유를 설명하라"는
+  경로를 명시적으로 열어두고 있어 우리 방식과 잘 맞는다. 숨기지 않고 먼저 밝히는 편이 강하다.
 
 ---
 
@@ -1583,7 +1656,7 @@ GPU 비용이 낮고(백본 고정 가능) 롱테일 서사에 직결된다.
 | 선택적 예측 | Temperature Scaling까지 했으니 risk-coverage 곡선까지 간다. "커버리지 80%에서 정확도 X%"가 서비스에 직접 쓰이는 수치 |
 | 종 라벨 신뢰도 | iNaturalist research-grade는 **커뮤니티 합의이지 전문가 검증이 아니다.** 논문에 명시하고, (B)의 전문가 검토로 표본 검증한다 |
 | null 결과 사전 규정 | **아래 12.9에서 확정** |
-| 실질 산출물 | MEE는 방법론지다. 설치 가능한 파이프라인 패키지를 내지 않으면 "템플릿"은 산문에 그친다. §11 코드 공개와 묶어 CLI/라이브러리 형태로 정리한다 |
+| 실질 산출물 | EI 는 code 를 research data 에 포함시킨다. 설치 가능한 파이프라인 패키지를 내면 재현성 요건을 충족하면서 기여도 분명해진다. §11 코드 공개와 묶어 CLI/라이브러리 형태로 정리한다 |
 
 ### 12.9 E5 null 결과 사전 규정 [v7 확정]
 
