@@ -1,9 +1,10 @@
 # 한국 사슴벌레 AI 도감 — 설계 문서 v7
 
-> 최종 수정: 2026-09-04
+> 최종 수정: 2026-09-06
 > 기준: v6 (2026-05-10) + 논문 리부트 설계 v0.2 병합, 미해결 3항목 확정 반영
-> 기준 코드베이스: `beetledex` / GitHub: `jjangmo91/lucanidae_classifier` (main 브랜치)
-> v6 문서는 git 히스토리에서 조회 (`git show <v6-commit>:DESIGN.md`). 본 문서가 단일 기준.
+> 저장소: `jjangmo91/lucanidae_classifier` (public) / **작업 브랜치 `v7`**
+> v6 시점 스냅샷은 `v6-poster` 태그. 본 문서가 단일 기준.
+> 실행 순서와 담당은 `docs/V7_TASKS.md`.
 
 ---
 
@@ -18,12 +19,11 @@
 | male_form | 주관 3분류 (규칙 없음) | **비율 계측 + 종별 분위수 규칙 + not_applicable** | §4.4 |
 | 테스트셋 | 단일 hold-out 199장 | **3층 구조 + 오염 방어.** v6 test는 특별 지위 폐지, 현장 15장만 3층 승격 | §4.5, §4.6 |
 | 통계 | 단일 hold-out, 3-seed | 반복 층화 CV(5×5) + 부트스트랩 CI | §3.5 |
-| v6 sweep 149개 | 최종 결과 | **전량 폐기** — 라벨 유실·조각 오염·검정력 부족으로 무효 | §3.4 |
+| v6 실험 결과 149 run | 최종 결과 / 예비 실험으로 보존 | **전량 폐기.** 라벨 유실·조각 오염·검정력 부족으로 무효 | §3.4 |
 | 라벨 단위 | 이미지 1장 = 종 1개 | **개체(crop) 단위 매니페스트로 이행** | §4.8 |
 | 다중 검출 | 전 crop이 원본 라벨 상속 | 병합 후 1장 저장 + 검수 큐, 다종은 개체별 라벨 | §4.8 |
 | 데이터 공개 | 계획 없음 | **매니페스트 공개 방식 확정**, 이미지 재배포에 의존하지 않음 | §11 |
 | 배경·위치 | full 우위를 맥락 정보로 해석 | **원인 분리가 E0의 임무.** 비율 파괴(확인됨) vs 배경 지름길(정황)을 실험이 가르게 함. 위치는 모델에서 배제 | §3.3 |
-| v6 실험 결과 | 예비 실험으로 보존 | **전량 폐기.** 라벨 유실·조각 오염·검정력 부족으로 무효 | §3.4 |
 | 수집 목표 | 종당 test 20장 | **종당 175-370개체 3단계 목표** | §13 |
 | 투고처 | MEE (primary) | **Ecological Informatics 로 교체.** MEE 가 단일 분류군 연구를 명시 배제 | §6, §6.6 |
 
@@ -32,7 +32,7 @@
 2. male_form 판정 규칙 → §4.4 — 계측 기반 규칙 확정, 기존 라벨 전량 재작업 대상
 3. v6 test 199장 재편입 → §4.6 — 현장 15장만 3층 승격, iNaturalist 184장은 1층 풀로 환원
 
-**v7에서 추가로 발견된 결함 2개** (둘 다 v6 실험 결과에 직접 영향):
+**v7에서 추가로 발견된 결함 3개** (앞의 둘은 v6 실험 결과를 직접 무효화):
 - 성별·형태 라벨의 **32.7%가 split 키 불일치로 유실**된 채 학습됨 → §4.3
 - 검출기 과분할로 **조각 이미지 309장이 종 라벨을 달고** bbox/seg 학습셋에 혼입 → §4.8
 - iNaturalist 이미지의 **31.9%가 재배포 불가(ARR)**이고 라이선스가 수집조차 안 됨 → §11.2
@@ -51,10 +51,12 @@
 | 분류군 정의 | `configs/taxonomy.yaml` | 16종 참조 목록의 실제 기준 |
 | 실험 기록 | MLflow DB | §11.5에 따라 CSV export 필요 |
 
-**주의 1** — 본 문서는 **아직 존재하지 않는 파일을 다수 참조한다.**
-`docs/adversarial_review.md`, `docs/male_form_protocol.md`, `data/labels/crops.csv`,
-`LICENSE`, `environment.yml`, `src/xai/`, §5.2의 신규 스크립트 대부분이 미작성이며
-Phase 7 M0의 작업 항목이다. 문서는 **현재 상태의 기술이 아니라 계획**이다.
+**주의 1** — 본 문서는 **아직 존재하지 않는 파일을 참조한다.**
+미작성분은 `docs/adversarial_review.md`, `data/labels/crops.csv`, `environment.yml`,
+`src/xai/`, `docs/figure_image_whitelist.csv`, 그리고 §5.2에서 "미작성"으로 표시된
+스크립트들이다. 전부 Phase 7 M0의 작업 항목이다.
+**문서는 현재 상태의 기술이 아니라 계획이다.** 참조 파일이 있는지 여부는 §5.2 표와
+`docs/V7_TASKS.md`의 체크박스로 확인한다.
 
 **주의 2** — 문서에 인용된 수치는 **v7 설계 시점의 데이터 상태**를 전제한다.
 재라벨링(§4.4)·재수집(§13)·detector 재학습(§4.8) 이후에는 `scripts/analysis/`를 다시 실행해
@@ -911,19 +913,25 @@ crop 단위가 추가되므로, 그룹 키는 `observation_id`를 유지하고 c
 
 ### 5.2 v7 신규
 
-| 스크립트 | 목적 | 대응 실험 |
-|---------|------|----------|
-| `scripts/check_tol_overlap.py` | FM 훈련 노출량 표 + MD5/PDQ dedupe | E3, §4.5 |
-| `scripts/subsample_curves.py` | 학습곡선 서브샘플링 러너 | E2 |
-| `scripts/background_probe.py` | 배경 셔플/중립화 교란 테스트 | E0, §3.3 |
-| `scripts/check_split_confounds.py` | 배경 클러스터·촬영자의 split 상관 검사 | §4.2 |
-| `scripts/compute_male_form.py` | keypoint 계측 → R 산출 → 종별 분위수 3분류 | §4.4 |
-| `src/xai/` | pointing game / energy PG / IoU 지표 모듈 | E4 |
-| `scripts/build_crop_manifest.py` | 박스 병합·패딩 후 crop 생성 + `crops.csv` 작성 | §4.8 |
-| `scripts/review_multi_detect.py` | 다중검출 205장 검수 큐 생성 | §4.8 |
-| `scripts/backfill_licenses.py` | observation_id로 사진 라이선스·출처표기 역조회 백필 | §11.5 |
-| `scripts/build_release_manifest.py` | 공개용 재구성 매니페스트 + sha256 생성 | §11.3 |
-| `scripts/export_mlflow.py` | MLflow run을 CSV로 export해 영구 보존 | §11.5 |
+| 스크립트 | 목적 | 대응 | 상태 |
+|---------|------|------|------|
+| `scripts/compute_male_form.py` | keypoint 계측 → R 산출 → 종별 분위수 3분류 | §4.4 | **작성됨** |
+| `scripts/review_multi_detect.py` | 다중검출 검수 큐 생성 | §4.8 | **작성됨** |
+| `scripts/export_mlflow.py` | MLflow run을 CSV로 export해 영구 보존 | §11.5 | **작성됨** |
+| `scripts/check_licenses.py` | 의존성 카피레프트 전수 검사 | §11.5 | **작성됨** |
+| `scripts/build_crop_manifest.py` | 박스 병합·패딩 후 crop 생성 + `crops.csv` 작성 | §4.8 | 미작성 |
+| `scripts/check_split_confounds.py` | 배경 클러스터·촬영자의 split 상관 검사 | §4.2 | 미작성 |
+| `scripts/background_probe.py` | 배경 셔플·중립화·치환 교란 테스트 | E0, §3.3 | 미작성 |
+| `scripts/subsample_curves.py` | 학습곡선 서브샘플링 러너 | E2 | 미작성 |
+| `scripts/check_tol_overlap.py` | FM 훈련 노출량 표 + MD5/PDQ dedupe | E3, §4.5 | 미작성 |
+| `scripts/build_release_manifest.py` | 공개용 재구성 매니페스트 + sha256 생성 | §11.3 | 미작성 |
+| `src/xai/` | pointing game / energy PG / IoU 지표 모듈 | E4 | 미작성 |
+
+> `scripts/backfill_licenses.py` 는 별도로 만들지 않았다. 역조회는
+> `scripts/analysis/backfill_licenses.py` 가 수행했고 결과는 `merged_metadata.csv` 에
+> 병합 완료다(§11.5). 신규 수집은 `scraper.py` 가 처음부터 라이선스를 기록한다.
+
+설계 근거 수치를 산출한 일회성 스크립트는 `scripts/analysis/` 에 따로 있다(§0.1).
 
 ### 5.3 analyze_results.py 산출물 (유지)
 
